@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Amani Court — Landlord System</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23142421'/%3E%3Cpath d='M8 23V13l8-5 8 5v10' fill='none' stroke='%23e7b15a' stroke-width='2'/%3E%3Cpath d='M13 23v-6h6v6' fill='none' stroke='%23e7b15a' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,6 +70,7 @@
   nav { display: flex; flex-direction: column; gap: 4px; }
   .nav { width: 100%; display: flex; gap: 10px; align-items: center; text-align: left; background: transparent; border: 0; color: var(--side-text); padding: 10px 12px; border-radius: 12px; }
   .nav span { line-height: 1.25; }
+  .nav-short { display: none; }
   .nav svg { flex: none; opacity: .9; }
   .nav.active { background: #f4f1ea; color: var(--ink); }
   .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 6px; padding: 0 8px; }
@@ -147,12 +148,13 @@
   .toolbar .field { min-width: 200px; }
   .field span, .hint { color: var(--muted); font-size: 13px; }
   .field.inline { grid-auto-flow: column; align-items: center; min-width: 0; }
-  input, select, textarea { background: white; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
+  input, select, textarea { background: white; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; max-width: 100%; }
+  button, .btn, .nav, .seg button, .chip, .stat { touch-action: manipulation; }
   textarea { min-height: 110px; resize: vertical; }
   .form-grid { display: grid; gap: 12px; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-  .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
+  .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); max-width: 100%; min-width: 0; -webkit-overflow-scrolling: touch; }
   table { width: 100%; border-collapse: collapse; min-width: 720px; }
   table.ledger { min-width: 1040px; }
   .seg-label { color: var(--muted); font-size: 12px; align-self: center; }
@@ -191,18 +193,72 @@
   .doc-top { display: flex; justify-content: space-between; gap: 12px; align-items: start; margin-bottom: 12px; }
   .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
 
-  #toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(12px); background: var(--side); color: #f6f3ec; padding: 12px 16px; border-radius: 16px; max-width: min(640px, calc(100% - 32px)); opacity: 0; pointer-events: none; transition: .2s ease; z-index: 40; text-align: center; }
+  .record h2 { font-size: 26px; }
+  #toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(12px); background: var(--side); color: #f6f3ec; padding: 12px 16px; border-radius: 16px; max-width: min(640px, calc(100% - 32px)); opacity: 0; pointer-events: none; transition: .2s ease; z-index: 40; text-align: center; }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   @media (max-width: 980px) {
-    .gate, .shell, .stats, .grid-2, .grid-main, .chips, .form-row { grid-template-columns: 1fr; }
-    aside { position: sticky; top: 0; height: auto; z-index: 6; }
-    nav { flex-direction: row; overflow: auto; }
-    .nav { width: auto; white-space: nowrap; }
-    .side-foot { flex-direction: row; }
-    .shell { grid-template-columns: 1fr; }
-    main, .top { padding-left: 16px; padding-right: 16px; }
-    .page-head { flex-direction: column; align-items: start; }
+    html { scroll-padding-top: 168px; }
+    .gate, .shell, .stats, .grid-2, .grid-main, .form-row, .calc { grid-template-columns: 1fr; }
+    .chips { grid-template-columns: 1fr 1fr; }
+    .shell, .workspace, aside, nav, main { min-width: 0; max-width: 100%; }
+    .shell { grid-template-columns: 1fr; width: 100%; }
+    aside { position: sticky; top: 0; height: auto; z-index: 8; padding: max(12px, env(safe-area-inset-top)) 12px 10px; gap: 10px; }
+    nav { width: 100%; }
+    .side-brand { padding: 0 4px; }
+    .side-brand span { display: none; }
+    nav { flex-direction: row; overflow-x: auto; gap: 6px; width: 100%; min-width: 0; padding: 0 0 2px; scrollbar-width: none; }
+    nav::-webkit-scrollbar { display: none; }
+    .nav { width: auto; white-space: nowrap; flex: none; min-height: 44px; padding: 8px 12px; }
+    .nav-full { display: none; }
+    .nav-short { display: inline; }
+    .side-foot { flex-direction: row; flex-wrap: wrap; gap: 4px 16px; padding: 0 4px; }
+    .top { position: static; flex-direction: column; align-items: stretch; gap: 10px; padding: 12px 16px; }
+    .top-actions { width: 100%; display: grid; gap: 8px; justify-content: stretch; }
+    .top-actions .field.inline { width: 100%; grid-template-columns: auto minmax(0, 1fr); }
+    .switch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+    .switch button { min-height: 44px; padding: 8px 6px; }
+    main { padding: 4px 16px calc(40px + env(safe-area-inset-bottom)); }
+    .page-head { flex-direction: column; align-items: stretch; }
+    .page-head h1 { font-size: 32px; }
+    .page-actions, .row-actions { width: 100%; }
+    .page-actions .btn, .row-actions .btn { flex: 1 1 auto; min-height: 44px; white-space: normal; text-align: center; }
+    .toolbar { align-items: stretch; }
+    .toolbar .field, .seg { width: 100%; min-width: 0; }
+    .seg button { min-height: 40px; }
+    .gate-brand, .gate-panel { padding: 28px 18px; }
+    .gate-brand h1 { font-size: 44px; }
+    .role-card .btn { width: 100%; min-height: 48px; }
+    .stat { max-width: none !important; }
+    .stat .num { font-size: 26px; }
+    .linkish { min-height: 40px; }
+    .record h2 { font-size: 22px; }
+    .record header { align-items: flex-start; }
+    dd, .muted, .lede, .doc { overflow-wrap: anywhere; }
+    .table-wrap { overflow: visible; border: 0; background: transparent; box-shadow: none; }
+    table, table.ledger, thead, tbody, tfoot, tr, td { display: block; width: auto; min-width: 0; }
+    thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    tr { background: var(--card); border: 1px solid var(--line); border-radius: 16px; margin-bottom: 10px; padding: 6px 0; box-shadow: var(--shadow); }
+    td { border: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; text-align: right; padding: 8px 14px; }
+    td::before { content: attr(data-label); flex: 0 0 38%; color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; text-align: left; }
+    td.num { text-align: right; }
+    td.actions { flex-wrap: wrap; justify-content: flex-end; }
+    td.actions::before { content: none; }
+    td.actions .btn { min-height: 40px; }
+    td[colspan], tr.empty td { display: block; text-align: left; }
+    td[colspan]::before, tr.empty td::before, td[data-label=""]::before { content: none; }
+    tfoot td[colspan] { display: none; }
+    .overlay { padding: 0; align-items: end; }
+    .modal, .modal.wide { width: 100%; max-height: min(92dvh, 100%); overflow: auto; border-radius: 20px 20px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+    .modal h2 { font-size: 26px; }
+    .modal-actions { flex-direction: column-reverse; align-items: stretch; }
+    .modal-actions .btn { width: 100%; min-height: 44px; }
+    .doc-top { flex-direction: column; }
+    input, select, textarea { font-size: 16px; }
+  }
+  @media (max-width: 420px) {
+    .chips { grid-template-columns: 1fr; }
+    .gate-brand h1 { font-size: 38px; }
   }
 </style>
 </head>
@@ -552,6 +608,11 @@ function render(opts = {}) {
       try { el.setSelectionRange(len, len); } catch (_) { /* selects */ }
     }
   }
+  const currentNav = document.querySelector("nav .nav.active");
+  if (currentNav && currentNav.parentElement && window.matchMedia("(max-width: 980px)").matches) {
+    const nav = currentNav.parentElement;
+    nav.scrollLeft = Math.max(0, currentNav.offsetLeft - (nav.clientWidth - currentNav.offsetWidth) / 2);
+  }
 }
 function pageTitle() {
   if (ui.view === "home") return ui.role === "landlord" ? "Super dashboard" : "Overview";
@@ -627,9 +688,10 @@ function shell() {
   return `<div class="shell">${sidebar()}<div class="workspace">${topbar()}<main>${view()}</main></div></div>${modal()}`;
 }
 function sidebar() {
+  const short = { home: "Home", providers: "Providers", request: "Finance", complaints: "Complaints", charges: "Charges", water: "Water", visitors: "Visitors", finance: "Finance" };
   const items = NAV[ui.role].map(([id, label]) => `
-    <button type="button" class="nav ${ui.view === id ? "active" : ""}" data-action="set-view" data-view="${id}" ${ui.view === id ? 'aria-current="page"' : ""}>
-      ${navIcon(id)}<span>${label}</span>
+    <button type="button" class="nav ${ui.view === id ? "active" : ""}" data-action="set-view" data-view="${id}" aria-label="${label}" ${ui.view === id ? 'aria-current="page"' : ""}>
+      ${navIcon(id)}<span class="nav-full">${label}</span><span class="nav-short">${short[id] || label}</span>
     </button>`).join("");
   return `<aside>
     <div class="side-brand">${mark()}<div><strong>Amani Court</strong><span>${periodLabel()}</span></div></div>
@@ -800,15 +862,18 @@ function managementHome() {
     </section>`;
 }
 
+function cell(label, html, cls) {
+  return `<td${cls ? ` class="${cls}"` : ""} data-label="${esc(label)}">${html}</td>`;
+}
 function providersPage() {
   const list = periodProviders();
   const drafts = list.filter(p => p.status === "draft");
   const rows = list.map(p => `<tr>
-    <td>${esc(p.category)}<div class="muted">${esc(p.detail)}</div></td>
-    <td>${esc(p.provider)}<div class="muted">${esc(p.email)}</div></td>
-    <td class="num">${kes(p.amount)}</td>
-    <td>${pill(p.status)}</td>
-    <td class="actions">${p.status === "draft" ? `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="provider" data-id="${p.id}">Edit</button>` : ""}${p.receiptNo ? `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="receipt" data-id="${p.id}">${esc(p.receiptNo)}</button>` : `<span class="muted">${p.status === "requested" ? "Waiting on Finance" : ""}</span>`}</td>
+    ${cell("Expense", `${esc(p.category)}<div class="muted">${esc(p.detail)}</div>`)}
+    ${cell("Provider", `${esc(p.provider)}<div class="muted">${esc(p.email)}</div>`)}
+    ${cell("Amount", kes(p.amount), "num")}
+    ${cell("Status", pill(p.status))}
+    ${cell("Receipt", `${p.status === "draft" ? `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="provider" data-id="${p.id}">Edit</button>` : ""}${p.receiptNo ? `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="receipt" data-id="${p.id}">${esc(p.receiptNo)}</button>` : `<span class="muted">${p.status === "requested" ? "Waiting on Finance" : ""}</span>`}`, "actions")}
   </tr>`).join("");
   const paid = list.filter(p => p.status === "paid").reduce((s, p) => s + p.amount, 0);
   const requested = list.filter(p => p.status === "requested").reduce((s, p) => s + p.amount, 0);
@@ -829,10 +894,10 @@ function requestPage() {
   const drafts = periodProviders().filter(p => p.status === "draft");
   const total = drafts.reduce((sum, item) => sum + item.amount, 0);
   const rows = drafts.map(p => `<tr>
-    <td>${esc(p.category)}<div class="muted">${esc(p.detail)}</div></td>
-    <td>${esc(p.provider)}<div class="muted">${esc(p.email)}</div></td>
-    <td class="num">${kes(p.amount)}</td>
-    <td class="actions"><button type="button" class="btn small quiet" data-action="open-modal" data-modal="provider" data-id="${p.id}">Edit</button></td>
+    ${cell("Expense", `${esc(p.category)}<div class="muted">${esc(p.detail)}</div>`)}
+    ${cell("Provider", `${esc(p.provider)}<div class="muted">${esc(p.email)}</div>`)}
+    ${cell("Amount", kes(p.amount), "num")}
+    ${cell("", `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="provider" data-id="${p.id}">Edit</button>`, "actions")}
   </tr>`).join("");
   return `
     ${head("Service Provider Management", "Finance request", "These are the " + periodLabel() + " drafts. Edit any row, then trigger the request. Finance receives only what you send.", `<button type="button" class="btn primary" data-action="trigger-providers">Trigger ${periodLabel()} request (${drafts.length})</button>`)}
@@ -840,23 +905,23 @@ function requestPage() {
     <article class="stat" style="margin-bottom:12px; max-width:320px"><span>Ready to send</span><strong class="num">${kes(total)}</strong><em>${drafts.length} draft${drafts.length === 1 ? "" : "s"}</em></article>
     <div class="table-wrap"><table>
       <thead><tr><th>Expense</th><th>Provider</th><th class="num">Amount</th><th></th></tr></thead>
-      <tbody>${rows || `<tr><td colspan="4">No drafts for ${periodLabel()}. Add an expense from Service Provider Management.</td></tr>`}</tbody>
+      <tbody>${rows || `<tr class="empty"><td colspan="4">No drafts for ${periodLabel()}. Add an expense from Service Provider Management.</td></tr>`}</tbody>
     </table></div>`;
 }
 function financePage() {
   const rows = periodProviders().filter(p => p.status !== "draft").map(p => `<tr>
-    <td>${esc(p.provider)}<div class="muted">${esc(p.email)}</div></td>
-    <td>${esc(p.category)}<div class="muted">${esc(p.detail)}</div></td>
-    <td class="num">${kes(p.amount)}</td>
-    <td>${pill(p.status)}<div class="muted">${p.requestedAt ? "Requested " + fmtStamp(p.requestedAt) : ""}</div></td>
-    <td class="actions">${p.status === "requested" ? `<button type="button" class="btn small primary" data-action="open-modal" data-modal="pay" data-id="${p.id}">Record payment</button>` : `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="receipt" data-id="${p.id}">View receipt</button>`}</td>
+    ${cell("Provider", `${esc(p.provider)}<div class="muted">${esc(p.email)}</div>`)}
+    ${cell("Expense", `${esc(p.category)}<div class="muted">${esc(p.detail)}</div>`)}
+    ${cell("Amount", kes(p.amount), "num")}
+    ${cell("Status", `${pill(p.status)}<div class="muted">${p.requestedAt ? "Requested " + fmtStamp(p.requestedAt) : ""}</div>`)}
+    ${cell("", p.status === "requested" ? `<button type="button" class="btn small primary" data-action="open-modal" data-modal="pay" data-id="${p.id}">Record payment</button>` : `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="receipt" data-id="${p.id}">View receipt</button>`, "actions")}
   </tr>`).join("");
   return `
     ${head("Service Provider Management", "Finance desk", "Requests the landlord triggered for " + periodLabel() + " arrive here. Record the payment and a receipt is sent to the provider, with a copy to the landlord.")}
     ${access("Pay this period’s requested expenses and issue receipts. Drafts stay on the landlord’s finance request page. Other months remain on record.")}
     <div class="table-wrap"><table>
       <thead><tr><th>Provider</th><th>Expense</th><th class="num">Amount</th><th>Status</th><th></th></tr></thead>
-      <tbody>${rows || `<tr><td colspan="5">No payment requests yet.</td></tr>`}</tbody>
+      <tbody>${rows || `<tr class="empty"><td colspan="5">No payment requests yet.</td></tr>`}</tbody>
     </table></div>`;
 }
 
@@ -881,7 +946,7 @@ function complaintCard(c) {
   const actions = ui.role === "management" && c.status !== "resolved" ? `<div class="row-actions"><button type="button" class="btn small primary" data-action="open-modal" data-modal="response" data-id="${c.id}">${c.response ? "Update response" : "Respond"}</button></div>` : "";
   const who = ui.role === "tenant" ? esc(c.category) : `${c.unitId} · ${esc(unit.tenant)} · ${esc(c.category)}`;
   return `<article class="record">
-    <header><div><span class="muted">${who}</span><h2 style="font-size:26px">${esc(c.subject)}</h2></div>${pill(c.status)}</header>
+    <header><div><span class="muted">${who}</span><h2>${esc(c.subject)}</h2></div>${pill(c.status)}</header>
     <p>${esc(c.details)}</p>
     <span class="muted">Filed ${fmtStamp(c.createdAt)}</span>
     ${banner}
@@ -896,14 +961,14 @@ function chargeBody() {
     const actions = !unit.tenant ? "" : `<button type="button" class="btn small quiet" data-action="send-invoice" data-id="${unit.id}">${pay.invoiceSentAt ? "Resend" : "Send invoice"}</button> ${pay.invoiceNo ? `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="invoice" data-id="${unit.id}">View</button>` : ""}`;
     const water = waterState(pay, bill);
     return `<tr>
-      <td><strong>${unit.id}</strong></td>
-      <td>${esc(unit.tenant || "Vacant")}</td>
-      <td class="num">${kes(unit.rent)}</td>
-      <td>${pill(unit.tenant ? pay.status : "vacant")}<div class="muted">${pay.paidAt ? fmtStamp(pay.paidAt) : ""}</div></td>
-      <td class="num">${bill == null ? "—" : kes(bill)}</td>
-      <td>${pill(water)}${pay.waterPaidAt ? `<div class="muted">${fmtStamp(pay.waterPaidAt)}</div>` : ""}</td>
-      <td>${invoice}</td>
-      <td class="actions">${actions}</td>
+      ${cell("House / unit", `<strong>${unit.id}</strong>`)}
+      ${cell("Tenant", esc(unit.tenant || "Vacant"))}
+      ${cell("Rent", kes(unit.rent), "num")}
+      ${cell("Rent status", `${pill(unit.tenant ? pay.status : "vacant")}<div class="muted">${pay.paidAt ? fmtStamp(pay.paidAt) : ""}</div>`)}
+      ${cell("Water bill", bill == null ? "—" : kes(bill), "num")}
+      ${cell("Water status", `${pill(water)}${pay.waterPaidAt ? `<div class="muted">${fmtStamp(pay.waterPaidAt)}</div>` : ""}`)}
+      ${cell("Invoice", invoice)}
+      ${actions ? cell("", actions, "actions") : ""}
     </tr>`;
   }).join("");
 }
@@ -920,7 +985,7 @@ function chargesPage() {
     <p class="hint" id="filter-note" style="margin: -4px 0 10px">${chargeNote()}</p>
     <div class="table-wrap"><table class="ledger">
       <thead><tr><th>House / unit</th><th>Tenant</th><th class="num">Rent</th><th>Rent status</th><th class="num">Water bill</th><th>Water status</th><th>Invoice</th><th></th></tr></thead>
-      <tbody id="filter-results">${body || `<tr><td colspan="8">No units match that filter.</td></tr>`}</tbody>
+      <tbody id="filter-results">${body || `<tr class="empty"><td colspan="8">No units match that filter.</td></tr>`}</tbody>
     </table></div>`;
 }
 function chargeToolbar() {
@@ -973,13 +1038,14 @@ function waterPage() {
     <div class="table-wrap"><table>
       <thead><tr><th>Unit</th><th>Tenant</th><th class="num">Previous</th><th class="num">Current</th><th class="num">Units consumed</th><th class="num">Unit price</th><th class="num">Water bill</th></tr></thead>
       <tbody>${body}</tbody>
-      <tfoot><tr><td colspan="6">${periodLabel()} total</td><td class="num">${kes(total)}</td></tr></tfoot>
+      <tfoot><tr><td colspan="6">${periodLabel()} total</td><td class="num" data-label="${periodLabel()} total">${kes(total)}</td></tr></tfoot>
     </table></div>`;
 }
 function waterTr(row) {
   const rec = row.rec;
-  if (!rec) return `<tr><td><strong>${row.unit.id}</strong></td><td>${esc(row.unit.tenant || "Vacant")}</td><td class="num">${qty(priorReading(row.unit.id))}</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td>${pill("missing")}</td></tr>`;
-  return `<tr><td><strong>${row.unit.id}</strong></td><td>${esc(row.unit.tenant || "Vacant")}</td><td class="num">${qty(rec.previous)}</td><td class="num">${qty(rec.current)}</td><td class="num">${qty(row.units)}</td><td class="num">${kes(rec.price)}</td><td class="num">${kes(row.bill)}</td></tr>`;
+  const tenant = esc(row.unit.tenant || "Vacant");
+  if (!rec) return `<tr>${cell("Unit", `<strong>${row.unit.id}</strong>`)}${cell("Tenant", tenant)}${cell("Previous", qty(priorReading(row.unit.id)), "num")}${cell("Current", "—", "num")}${cell("Units consumed", "—", "num")}${cell("Unit price", "—", "num")}${cell("Water bill", pill("missing"))}</tr>`;
+  return `<tr>${cell("Unit", `<strong>${row.unit.id}</strong>`)}${cell("Tenant", tenant)}${cell("Previous", qty(rec.previous), "num")}${cell("Current", qty(rec.current), "num")}${cell("Units consumed", qty(row.units), "num")}${cell("Unit price", kes(rec.price), "num")}${cell("Water bill", kes(row.bill), "num")}</tr>`;
 }
 function tenantWater() {
   const unit = unitById(ui.unitId);
@@ -1021,12 +1087,12 @@ function managementWater() {
       <div class="table-wrap"><table>
         <thead><tr><th>Unit</th><th class="num">Previous</th><th class="num">Current</th><th class="num">Units</th><th class="num">Bill</th><th></th></tr></thead>
         <tbody>${waterRows().map(row => `<tr>
-          <td><strong>${row.unit.id}</strong><div class="muted">${esc(row.unit.tenant || "Vacant")}</div></td>
-          <td class="num">${qty(row.rec ? row.rec.previous : priorReading(row.unit.id))}</td>
-          <td class="num">${row.rec ? qty(row.rec.current) : "—"}</td>
-          <td class="num">${row.rec ? qty(row.units) : "—"}</td>
-          <td class="num">${row.rec ? kes(row.bill) : "—"}</td>
-          <td><button type="button" class="btn small quiet" data-action="edit-meter" data-id="${row.unit.id}">${row.rec ? "Edit" : "Enter"}</button></td>
+          ${cell("Unit", `<strong>${row.unit.id}</strong><div class="muted">${esc(row.unit.tenant || "Vacant")}</div>`)}
+          ${cell("Previous", qty(row.rec ? row.rec.previous : priorReading(row.unit.id)), "num")}
+          ${cell("Current", row.rec ? qty(row.rec.current) : "—", "num")}
+          ${cell("Units", row.rec ? qty(row.units) : "—", "num")}
+          ${cell("Bill", row.rec ? kes(row.bill) : "—", "num")}
+          ${cell("", `<button type="button" class="btn small quiet" data-action="edit-meter" data-id="${row.unit.id}">${row.rec ? "Edit" : "Enter"}</button>`, "actions")}
         </tr>`).join("")}</tbody>
       </table></div>
     </div>`;
@@ -1059,7 +1125,7 @@ function visitorCard(v) {
   if (ui.role === "management" && v.status === "in") actions = `<div class="row-actions"><button type="button" class="btn small ink" data-action="check-out" data-id="${v.id}">Check out</button></div>`;
   const today = v.expectedDate === TODAY && v.status === "expected" ? `<span class="pill warn">Today</span>` : "";
   return `<article class="record">
-    <header><div><span class="muted">${v.unitId} · ${esc(unit.tenant || "Vacant")}</span><h2 style="font-size:26px">${esc(v.name)}</h2></div><div class="row-actions">${today}${pill(v.status)}</div></header>
+    <header><div><span class="muted">${v.unitId} · ${esc(unit.tenant || "Vacant")}</span><h2>${esc(v.name)}</h2></div><div class="row-actions">${today}${pill(v.status)}</div></header>
     <dl class="meta">
       <div><dt>Expected</dt><dd>${expectedLabel(v)}</dd></div>
       <div><dt>Check in</dt><dd>${fmtStamp(v.checkIn)}</dd></div>
@@ -1510,7 +1576,7 @@ function onInput(event) {
     if (results && ui.view === "charges") {
       const note = document.getElementById("filter-note");
       if (note) note.innerHTML = chargeNote();
-      results.innerHTML = chargeBody() || `<tr><td colspan="8">No units match that filter.</td></tr>`;
+      results.innerHTML = chargeBody() || `<tr class="empty"><td colspan="8">No units match that filter.</td></tr>`;
       return;
     }
     if (results && (ui.view === "complaints" || ui.view === "visitors")) {
