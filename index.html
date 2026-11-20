@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amani Court — Landlord System</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23142421'/%3E%3Cpath d='M8 23V13l8-5 8 5v10' fill='none' stroke='%23e7b15a' stroke-width='2'/%3E%3Cpath d='M13 23v-6h6v6' fill='none' stroke='%23e7b15a' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #efeae1;
+    --card: #fffcf8;
+    --ink: #1c1916;
+    --muted: #6a6258;
+    --line: #e3dcd0;
+    --teal: #0f5e56;
+    --teal-soft: #e4f2ef;
+    --clay: #b5522a;
+    --clay-soft: #f8ebe4;
+    --gold: #8d6a2f;
+    --gold-soft: #f6edd9;
+    --good: #1d6b45;
+    --good-soft: #e5f3eb;
+    --side: #142421;
+    --side-text: #d7e4de;
+    --gold-line: #e7b15a;
+    --shadow: 0 1px 0 rgba(28, 25, 22, .04);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: Outfit, "Avenir Next", "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  h1, h2, h3, .num { font-family: Fraunces, Georgia, serif; font-weight: 560; letter-spacing: -0.03em; margin: 0; }
+  p { margin: 0; }
+  :focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  .gate { display: grid; grid-template-columns: minmax(300px, 1.05fr) minmax(320px, .95fr); min-height: 100vh; }
+  .gate-brand { background: var(--side); color: #f6f3ec; padding: 48px 44px; display: flex; flex-direction: column; gap: 18px; }
+  .gate-brand h1 { font-size: clamp(48px, 6vw, 76px); line-height: .95; color: #f6f3ec; }
+  .gate-brand .lede { color: #c9d7d1; max-width: 46ch; font-size: 17px; }
+  .brand-lockup { display: flex; align-items: center; gap: 10px; color: var(--gold-line); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
+  .module-list { margin-top: 8px; display: grid; gap: 10px; }
+  .module-list li { list-style: none; display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; color: #d5e2dc; }
+  .module-list ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .idx { width: 28px; height: 28px; border: 1px solid rgba(231, 177, 90, .45); border-radius: 50%; display: grid; place-items: center; color: var(--gold-line); font-size: 13px; }
+  .gate-panel { padding: 36px 32px 48px; display: flex; flex-direction: column; gap: 14px; }
+  .gate-panel h2 { font-size: 28px; }
+  .role-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
+  .role-card ul { margin: 4px 0 8px; padding-left: 18px; }
+  .role-card li { margin: 4px 0; }
+  .who { color: var(--muted); }
+
+  .shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+  aside { background: var(--side); color: var(--side-text); padding: 22px 14px 16px; display: flex; flex-direction: column; gap: 18px; position: sticky; top: 0; height: 100vh; }
+  .side-brand { display: flex; gap: 10px; align-items: center; padding: 0 8px; color: #f6f3ec; }
+  .side-brand strong { display: block; font-family: Fraunces, Georgia, serif; font-size: 20px; font-weight: 560; letter-spacing: -0.03em; }
+  .side-brand span { color: #9fb2ab; font-size: 12px; }
+  nav { display: flex; flex-direction: column; gap: 4px; }
+  .nav { width: 100%; display: flex; gap: 10px; align-items: center; text-align: left; background: transparent; border: 0; color: var(--side-text); padding: 10px 12px; border-radius: 12px; }
+  .nav span { line-height: 1.25; }
+  .nav svg { flex: none; opacity: .9; }
+  .nav.active { background: #f4f1ea; color: var(--ink); }
+  .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 6px; padding: 0 8px; }
+  .linkish { background: none; border: 0; color: #b7c7c0; padding: 6px 0; text-align: left; }
+  .linkish:hover { color: white; }
+
+  .workspace { min-width: 0; }
+  .top { position: sticky; top: 0; z-index: 5; display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 14px 28px; background: rgba(239, 234, 225, .92); backdrop-filter: blur(12px); border-bottom: 1px solid transparent; }
+  .top-title { display: flex; flex-direction: column; gap: 2px; }
+  .top-title strong { font-size: 14px; }
+  .eyebrow { color: var(--muted); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+  .top-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .switch { display: flex; background: #e7e1d6; border-radius: 999px; padding: 3px; }
+  .switch button { border: 0; background: transparent; border-radius: 999px; padding: 7px 12px; color: var(--muted); }
+  .switch button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+
+  main { padding: 8px 28px 56px; max-width: 1180px; }
+  .page-head { display: flex; justify-content: space-between; gap: 18px; align-items: flex-end; margin: 10px 0 16px; }
+  .page-head h1 { font-size: clamp(32px, 4vw, 44px); line-height: 1; }
+  .lede { color: var(--muted); max-width: 68ch; margin-top: 8px; }
+  .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--clay); font-weight: 600; }
+  .access { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  .access b { color: var(--ink); font-weight: 600; }
+  .page-actions, .row-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  .btn { border-radius: 999px; padding: 10px 16px; border: 1px solid transparent; background: var(--card); font-weight: 600; }
+  .btn.small { padding: 6px 11px; font-size: 13px; }
+  .btn.primary { background: var(--teal); color: white; }
+  .btn.primary:hover { background: #0c4d47; }
+  .btn.quiet { background: transparent; border-color: var(--line); }
+  .btn.quiet:hover { border-color: #c9bfb0; }
+  .btn.ink { background: var(--ink); color: #f6f3ec; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  .stats { display: grid; grid-template-columns: 1.45fr repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px; box-shadow: var(--shadow); text-align: left; }
+  button.stat { width: 100%; cursor: pointer; }
+  button.stat:hover { border-color: #c9bfb0; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .stat em { font-style: normal; color: var(--muted); font-size: 13px; }
+  .stat .num { font-size: 30px; line-height: 1.05; }
+  .stat.hero { background: var(--side); color: #f6f3ec; border-color: var(--side); }
+  .stat.hero span, .stat.hero em { color: #c5d5ce; }
+  .track { height: 8px; background: #2c463f; border-radius: 99px; overflow: hidden; margin-top: 4px; }
+  .track span { display: block; height: 100%; background: var(--gold-line); }
+  .track.light { background: #ece6db; }
+  .track.light span { background: var(--teal); }
+
+  .grid-2 { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
+  .grid-main { display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); gap: 12px; align-items: start; }
+  .grid-main > * { min-width: 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 16px 8px; box-shadow: var(--shadow); }
+  .card.pad { padding: 16px; }
+  .card h2 { font-size: 26px; }
+  .card-head { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; margin-bottom: 6px; }
+  .item { padding: 12px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+  .item:last-child { border-bottom: 0; }
+  .muted { color: var(--muted); }
+  .split-meta { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+
+  .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .chip { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 12px 12px 14px; box-shadow: var(--shadow); }
+  .chip:hover { border-color: var(--teal); }
+  .chip strong { font-family: Fraunces, Georgia, serif; font-size: 22px; font-weight: 560; line-height: 1.1; }
+  .chip .muted { font-size: 13px; }
+  .chip.paid { box-shadow: inset 3px 0 0 var(--good); }
+  .chip.unpaid { box-shadow: inset 3px 0 0 var(--clay); }
+  .chip.vacant { box-shadow: inset 3px 0 0 #c8c0b4; }
+
+  .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: end; margin: 6px 0 12px; flex-wrap: wrap; }
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { border-radius: 999px; border: 1px solid var(--line); background: transparent; padding: 7px 12px; }
+  .seg button.on { background: var(--ink); color: #f6f3ec; border-color: var(--ink); }
+  .field { display: grid; gap: 6px; min-width: 0; }
+  .toolbar .field { min-width: 200px; }
+  .field span, .hint { color: var(--muted); font-size: 13px; }
+  .field.inline { grid-auto-flow: column; align-items: center; min-width: 0; }
+  input, select, textarea { background: white; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
+  textarea { min-height: 110px; resize: vertical; }
+  .form-grid { display: grid; gap: 12px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; min-width: 720px; }
+  table.ledger { min-width: 1040px; }
+  .seg-label { color: var(--muted); font-size: 12px; align-self: center; }
+  th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  td, th { padding: 12px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tfoot td { font-weight: 600; }
+
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .pill.neutral { background: #eeeae2; color: #5c564c; }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.warn { background: var(--gold-soft); color: #7a5410; }
+  .pill.bad { background: var(--clay-soft); color: var(--clay); }
+  .pill.info { background: var(--teal-soft); color: var(--teal); }
+
+  .stack { display: grid; gap: 10px; }
+  .record { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow); display: grid; gap: 8px; }
+  .record header { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+  .reply { background: #f7f4ee; border-radius: 12px; padding: 10px 12px; display: grid; gap: 4px; }
+  .banner { background: var(--good-soft); color: var(--good); border-radius: 12px; padding: 10px 12px; font-weight: 600; }
+  dl.meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 16px; margin: 0; }
+  dt { color: var(--muted); font-size: 12px; }
+  dd { margin: 0; font-weight: 600; }
+
+  .calc { background: var(--teal-soft); border-radius: 14px; padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .calc .lbl { color: var(--teal); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+  .calc strong { display: block; font-family: Fraunces, Georgia, serif; font-size: 26px; font-weight: 560; }
+
+  .overlay { position: fixed; inset: 0; background: rgba(18, 28, 26, .48); display: grid; place-items: center; padding: 24px; z-index: 20; overflow: auto; }
+  .modal { width: min(560px, 100%); background: var(--card); border-radius: 18px; padding: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.18); }
+  .modal.wide { width: min(680px, 100%); }
+  .modal h2 { font-size: 30px; margin-bottom: 4px; }
+  .doc { border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin: 12px 0; background: white; }
+  .doc-top { display: flex; justify-content: space-between; gap: 12px; align-items: start; margin-bottom: 12px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+
+  #toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(12px); background: var(--side); color: #f6f3ec; padding: 12px 16px; border-radius: 16px; max-width: min(640px, calc(100% - 32px)); opacity: 0; pointer-events: none; transition: .2s ease; z-index: 40; text-align: center; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 980px) {
+    .gate, .shell, .stats, .grid-2, .grid-main, .chips, .form-row { grid-template-columns: 1fr; }
+    aside { position: sticky; top: 0; height: auto; z-index: 6; }
+    nav { flex-direction: row; overflow: auto; }
+    .nav { width: auto; white-space: nowrap; }
+    .side-foot { flex-direction: row; }
+    .shell { grid-template-columns: 1fr; }
+    main, .top { padding-left: 16px; padding-right: 16px; }
+    .page-head { flex-direction: column; align-items: start; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const PERIODS = [
+  { key: "2026-11", label: "November 2026" },
+  { key: "2026-10", label: "October 2026" },
+  { key: "2026-09", label: "September 2026" }
+];
+const CURRENT_PERIOD = "2026-11";
+const TODAY = "2026-11-19";
+const TARIFF = 115;
+const KEY = "amani-court-v2";
+const UI_KEY = "amani-court-ui";
+function periodKey() {
+  if (ui.role === "tenant") return CURRENT_PERIOD;
+  return ui.period || CURRENT_PERIOD;
+}
+function periodLabel(key = periodKey()) { return (PERIODS.find(item => item.key === key) || PERIODS[0]).label; }
+function periodCode(key = periodKey()) { return key.replace("-", ""); }
+
+const UNITS = [
+  { id: "A-101", tenant: "Amina Otieno", rent: 48000, opening: 1204, email: "amina.otieno@amani.test", phone: "+254 712 000 101" },
+  { id: "A-102", tenant: "Brian Kamau", rent: 48000, opening: 876, email: "brian.kamau@amani.test", phone: "+254 712 000 102" },
+  { id: "A-201", tenant: "Chloe Wanjiku", rent: 55000, opening: 640, email: "chloe.wanjiku@amani.test", phone: "+254 712 000 201" },
+  { id: "B-103", tenant: "David Mwangi", rent: 52000, opening: 1502, email: "david.mwangi@amani.test", phone: "+254 712 000 103" },
+  { id: "B-204", tenant: "Elena Njeri", rent: 52000, opening: 433, email: "elena.njeri@amani.test", phone: "+254 712 000 204" },
+  { id: "C-301", tenant: null, rent: 60000, opening: 210, email: "", phone: "" }
+];
+
+const NAV = {
+  tenant: [["home", "Overview"], ["complaints", "Complaint Management"], ["visitors", "Visitor Management"], ["charges", "Service Charge Management"], ["water", "Water Meter Management"]],
+  landlord: [["home", "Super dashboard"], ["providers", "Service Provider Management"], ["request", "Finance request"], ["complaints", "Complaint Management"], ["charges", "Service Charge Management"], ["water", "Water Meter Management"], ["visitors", "Visitor Management"]],
+  management: [["home", "Overview"], ["complaints", "Complaint Management"], ["visitors", "Visitor Management"], ["water", "Water Meter Management"], ["finance", "Service Provider Management"]]
+};
+
+const SEED = {
+  version: 2,
+  seq: 80,
+  counters: { receipt: 8 },
+  chargeSyncAt: { "2026-09": "2026-09-03T09:00:00", "2026-10": "2026-10-03T09:00:00", "2026-11": null },
+  pendingPayments: [{ unitId: "A-102", period: "2026-11", paidAt: "2026-11-19T08:22:00", method: "M-Pesa", reference: "QHX19A102" }],
+  pendingWater: [{ unitId: "A-101", period: "2026-11", paidAt: "2026-11-19T08:35:00", method: "M-Pesa" }],
+  providers: [
+    { id: "p1", period: "2026-11", category: "Staff salaries", provider: "Joseph Mensah", email: "joseph.mensah@amani.test", detail: "Caretaker", amount: 35000, status: "draft", requestedAt: null, paidAt: null, method: null, reference: null, receiptNo: null },
+    { id: "p2", period: "2026-11", category: "Staff salaries", provider: "Nightwatch Security", email: "accounts@nightwatch.test", detail: "Security team", amount: 62000, status: "requested", requestedAt: "2026-11-03T09:00:00", paidAt: null, method: null, reference: null, receiptNo: null },
+    { id: "p3", period: "2026-11", category: "Trash collection", provider: "Metro Waste Co.", email: "billing@metrowaste.test", detail: "Weekly collection, blocks A–C", amount: 14000, status: "paid", requestedAt: "2026-11-02T09:00:00", paidAt: "2026-11-06T11:20:00", method: "Bank transfer", reference: "FT26310MW", receiptNo: "RCP-202611-002" },
+    { id: "p4", period: "2026-11", category: "Wifi", provider: "FibreNest", email: "hello@fibrenest.test", detail: "Building connection", amount: 8500, status: "paid", requestedAt: "2026-11-02T09:10:00", paidAt: "2026-11-07T14:05:00", method: "M-Pesa", reference: "QH74WIFI", receiptNo: "RCP-202611-003" },
+    { id: "p5", period: "2026-11", category: "Staff salaries", provider: "Shine Crew", email: "shinecrew@amani.test", detail: "Cleaners", amount: 22000, status: "draft", requestedAt: null, paidAt: null, method: null, reference: null, receiptNo: null },
+    { id: "p6", period: "2026-10", category: "Staff salaries", provider: "Joseph Mensah", email: "joseph.mensah@amani.test", detail: "Caretaker", amount: 35000, status: "paid", requestedAt: "2026-10-02T09:00:00", paidAt: "2026-10-05T11:00:00", method: "Bank transfer", reference: "FT26305JM", receiptNo: "RCP-202610-004" },
+    { id: "p7", period: "2026-10", category: "Trash collection", provider: "Metro Waste Co.", email: "billing@metrowaste.test", detail: "Weekly collection, blocks A–C", amount: 14000, status: "paid", requestedAt: "2026-10-02T09:05:00", paidAt: "2026-10-06T10:12:00", method: "Bank transfer", reference: "FT26306MW", receiptNo: "RCP-202610-005" },
+    { id: "p8", period: "2026-10", category: "Other", provider: "Green Court Gardens", email: "hello@greencourt.test", detail: "Garden maintenance", amount: 9000, status: "draft", requestedAt: null, paidAt: null, method: null, reference: null, receiptNo: null },
+    { id: "p9", period: "2026-09", category: "Staff salaries", provider: "Nightwatch Security", email: "accounts@nightwatch.test", detail: "Security team", amount: 62000, status: "paid", requestedAt: "2026-09-02T09:00:00", paidAt: "2026-09-04T15:20:00", method: "Bank transfer", reference: "FT26304NS", receiptNo: "RCP-202609-006" },
+    { id: "p10", period: "2026-09", category: "Wifi", provider: "FibreNest", email: "hello@fibrenest.test", detail: "Building connection", amount: 8500, status: "paid", requestedAt: "2026-09-02T09:10:00", paidAt: "2026-09-05T09:40:00", method: "M-Pesa", reference: "QH09WIFI", receiptNo: "RCP-202609-007" }
+  ],
+  complaints: [
+    { id: "c4", period: "2026-11", unitId: "A-101", category: "Maintenance", subject: "Bedroom window latch", details: "The latch on the bedroom window does not catch, so the window will not lock.", createdAt: "2026-11-19T07:50:00", status: "open", response: "", respondedAt: null, resolvedAt: null },
+    { id: "c1", period: "2026-11", unitId: "A-102", category: "Plumbing", subject: "Kitchen sink leaking", details: "Water drips from the sink trap whenever the tap runs. It started on Tuesday.", createdAt: "2026-11-18T08:30:00", status: "open", response: "", respondedAt: null, resolvedAt: null },
+    { id: "c2", period: "2026-11", unitId: "A-201", category: "Noise", subject: "Music after 11pm", details: "Loud music from the corridor outside A-201 for the last three nights.", createdAt: "2026-11-16T21:05:00", status: "responded", response: "Spoke with the neighbouring unit. They agreed to keep music down after 10pm. We will check again this weekend.", respondedAt: "2026-11-17T15:10:00", resolvedAt: null },
+    { id: "c3", period: "2026-11", unitId: "B-103", category: "Electrical", subject: "Corridor light out", details: "The light outside B-103 has been dark for a week.", createdAt: "2026-11-09T11:20:00", status: "resolved", response: "Electrician replaced the fitting and tested the circuit.", respondedAt: "2026-11-11T09:00:00", resolvedAt: "2026-11-12T16:40:00" },
+    { id: "c5", period: "2026-10", unitId: "B-204", category: "Security", subject: "Gate remote failed", details: "The remote for the pedestrian gate stopped responding.", createdAt: "2026-10-14T18:10:00", status: "resolved", response: "Replaced the remote battery and reprogrammed it.", respondedAt: "2026-10-15T09:30:00", resolvedAt: "2026-10-16T11:00:00" },
+    { id: "c6", period: "2026-10", unitId: "A-102", category: "Plumbing", subject: "Slow bathroom drain", details: "The bathroom basin drains very slowly.", createdAt: "2026-10-08T08:15:00", status: "responded", response: "A plumber is booked for the last week of October.", respondedAt: "2026-10-09T12:00:00", resolvedAt: null },
+    { id: "c7", period: "2026-09", unitId: "A-201", category: "Maintenance", subject: "Balcony door sticks", details: "The balcony sliding door needs a hard pull to open.", createdAt: "2026-09-11T10:20:00", status: "resolved", response: "The track was cleaned and the rollers adjusted.", respondedAt: "2026-09-12T14:00:00", resolvedAt: "2026-09-13T16:10:00" }
+  ],
+  payments: [
+    { unitId: "A-101", period: "2026-11", status: "paid", paidAt: "2026-11-02T10:15:00", method: "M-Pesa", reference: "QH02A101", invoiceNo: "INV-A101-202611", invoiceSentAt: "2026-11-02T10:20:00", waterStatus: "unpaid", waterPaidAt: null, waterMethod: null },
+    { unitId: "A-102", period: "2026-11", status: "unpaid", paidAt: null, method: null, reference: null, invoiceNo: null, invoiceSentAt: null, waterStatus: "none", waterPaidAt: null, waterMethod: null },
+    { unitId: "A-201", period: "2026-11", status: "paid", paidAt: "2026-11-06T08:40:00", method: "Bank transfer", reference: "FT26311CW", invoiceNo: "INV-A201-202611", invoiceSentAt: "2026-11-06T08:45:00", waterStatus: "unpaid", waterPaidAt: null, waterMethod: null },
+    { unitId: "B-103", period: "2026-11", status: "paid", paidAt: "2026-11-01T18:05:00", method: "M-Pesa", reference: "QH01B103", invoiceNo: "INV-B103-202611", invoiceSentAt: "2026-11-01T18:10:00", waterStatus: "paid", waterPaidAt: "2026-11-08T09:12:00", waterMethod: "M-Pesa" },
+    { unitId: "B-204", period: "2026-11", status: "unpaid", paidAt: null, method: null, reference: null, invoiceNo: null, invoiceSentAt: null, waterStatus: "none", waterPaidAt: null, waterMethod: null },
+    { unitId: "C-301", period: "2026-11", status: "vacant", paidAt: null, method: null, reference: null, invoiceNo: null, invoiceSentAt: null, waterStatus: "none", waterPaidAt: null, waterMethod: null },
+    { unitId: "A-101", period: "2026-10", status: "paid", paidAt: "2026-10-02T09:10:00", method: "M-Pesa", reference: "QH10A101", invoiceNo: "INV-A101-202610", invoiceSentAt: "2026-10-02T09:20:00", waterStatus: "paid", waterPaidAt: "2026-10-09T11:00:00", waterMethod: "M-Pesa" },
+    { unitId: "A-102", period: "2026-10", status: "paid", paidAt: "2026-10-04T16:40:00", method: "Bank transfer", reference: "FT26304BK", invoiceNo: "INV-A102-202610", invoiceSentAt: "2026-10-04T16:50:00", waterStatus: "paid", waterPaidAt: "2026-10-10T08:15:00", waterMethod: "M-Pesa" },
+    { unitId: "A-201", period: "2026-10", status: "paid", paidAt: "2026-10-03T08:05:00", method: "Bank transfer", reference: "FT26303CW", invoiceNo: "INV-A201-202610", invoiceSentAt: "2026-10-03T08:10:00", waterStatus: "paid", waterPaidAt: "2026-10-11T13:20:00", waterMethod: "Bank transfer" },
+    { unitId: "B-103", period: "2026-10", status: "paid", paidAt: "2026-10-01T19:12:00", method: "M-Pesa", reference: "QH10B103", invoiceNo: "INV-B103-202610", invoiceSentAt: "2026-10-01T19:20:00", waterStatus: "paid", waterPaidAt: "2026-10-08T10:05:00", waterMethod: "M-Pesa" },
+    { unitId: "B-204", period: "2026-10", status: "unpaid", paidAt: null, method: null, reference: null, invoiceNo: "INV-B204-202610", invoiceSentAt: "2026-10-03T09:30:00", waterStatus: "unpaid", waterPaidAt: null, waterMethod: null },
+    { unitId: "C-301", period: "2026-10", status: "vacant", paidAt: null, method: null, reference: null, invoiceNo: null, invoiceSentAt: null, waterStatus: "none", waterPaidAt: null, waterMethod: null },
+    { unitId: "A-101", period: "2026-09", status: "paid", paidAt: "2026-09-02T11:00:00", method: "M-Pesa", reference: "QH09A101", invoiceNo: "INV-A101-202609", invoiceSentAt: "2026-09-02T11:10:00", waterStatus: "paid", waterPaidAt: "2026-09-08T09:40:00", waterMethod: "M-Pesa" },
+    { unitId: "A-102", period: "2026-09", status: "paid", paidAt: "2026-09-05T15:18:00", method: "M-Pesa", reference: "QH09A102", invoiceNo: "INV-A102-202609", invoiceSentAt: "2026-09-05T15:25:00", waterStatus: "paid", waterPaidAt: "2026-09-09T12:10:00", waterMethod: "M-Pesa" },
+    { unitId: "A-201", period: "2026-09", status: "paid", paidAt: "2026-09-03T08:22:00", method: "Bank transfer", reference: "FT26303A2", invoiceNo: "INV-A201-202609", invoiceSentAt: "2026-09-03T08:30:00", waterStatus: "paid", waterPaidAt: "2026-09-10T14:00:00", waterMethod: "Bank transfer" },
+    { unitId: "B-103", period: "2026-09", status: "paid", paidAt: "2026-09-01T17:45:00", method: "M-Pesa", reference: "QH09B103", invoiceNo: "INV-B103-202609", invoiceSentAt: "2026-09-01T17:55:00", waterStatus: "paid", waterPaidAt: "2026-09-07T11:18:00", waterMethod: "M-Pesa" },
+    { unitId: "B-204", period: "2026-09", status: "paid", paidAt: "2026-09-06T10:05:00", method: "Bank transfer", reference: "FT26306EN", invoiceNo: "INV-B204-202609", invoiceSentAt: "2026-09-06T10:12:00", waterStatus: "paid", waterPaidAt: "2026-09-12T09:00:00", waterMethod: "M-Pesa" },
+    { unitId: "C-301", period: "2026-09", status: "vacant", paidAt: null, method: null, reference: null, invoiceNo: null, invoiceSentAt: null, waterStatus: "none", waterPaidAt: null, waterMethod: null }
+  ],
+  meters: [
+    { id: "m1", unitId: "A-101", period: "2026-11", previous: 1204, current: 1218, price: 115, at: "2026-11-18T16:00:00" },
+    { id: "m2", unitId: "A-201", period: "2026-11", previous: 640, current: 661, price: 115, at: "2026-11-18T16:12:00" },
+    { id: "m3", unitId: "B-103", period: "2026-11", previous: 1502, current: 1520, price: 115, at: "2026-11-18T16:20:00" },
+    { id: "m4", unitId: "A-101", period: "2026-10", previous: 1186, current: 1204, price: 115, at: "2026-10-28T16:00:00" },
+    { id: "m5", unitId: "A-102", period: "2026-10", previous: 858, current: 876, price: 115, at: "2026-10-28T16:08:00" },
+    { id: "m6", unitId: "A-201", period: "2026-10", previous: 620, current: 640, price: 115, at: "2026-10-28T16:14:00" },
+    { id: "m7", unitId: "B-103", period: "2026-10", previous: 1484, current: 1502, price: 115, at: "2026-10-28T16:20:00" },
+    { id: "m8", unitId: "B-204", period: "2026-10", previous: 416, current: 433, price: 115, at: "2026-10-28T16:26:00" },
+    { id: "m9", unitId: "A-101", period: "2026-09", previous: 1168, current: 1186, price: 115, at: "2026-09-28T16:00:00" },
+    { id: "m10", unitId: "A-102", period: "2026-09", previous: 840, current: 858, price: 115, at: "2026-09-28T16:08:00" },
+    { id: "m11", unitId: "A-201", period: "2026-09", previous: 598, current: 620, price: 115, at: "2026-09-28T16:14:00" },
+    { id: "m12", unitId: "B-103", period: "2026-09", previous: 1466, current: 1484, price: 115, at: "2026-09-28T16:20:00" },
+    { id: "m13", unitId: "B-204", period: "2026-09", previous: 400, current: 416, price: 115, at: "2026-09-28T16:26:00" }
+  ],
+  visitors: [
+    { id: "v1", period: "2026-11", unitId: "A-101", name: "Peter Otieno", expectedDate: "2026-11-19", expectedTime: "16:00", note: "Brother", status: "expected", phone: "", idNumber: "", checkIn: null, checkOut: null },
+    { id: "v2", period: "2026-11", unitId: "B-103", name: "Grace Wanjala", expectedDate: "2026-11-19", expectedTime: "09:00", note: "", status: "in", phone: "+254 701 555 014", idNumber: "32441890", checkIn: "2026-11-19T09:14:00", checkOut: null },
+    { id: "v3", period: "2026-11", unitId: "A-201", name: "Samuel Lee", expectedDate: "2026-11-18", expectedTime: "11:00", note: "Contractor", status: "out", phone: "+254 733 221 908", idNumber: "29100433", checkIn: "2026-11-18T11:06:00", checkOut: "2026-11-18T12:41:00" },
+    { id: "v4", period: "2026-11", unitId: "B-204", name: "Fatma Ali", expectedDate: "2026-11-21", expectedTime: "10:30", note: "", status: "expected", phone: "", idNumber: "", checkIn: null, checkOut: null },
+    { id: "v5", period: "2026-10", unitId: "A-102", name: "Irene Kamau", expectedDate: "2026-10-18", expectedTime: "14:00", note: "Sister", status: "out", phone: "+254 711 440 220", idNumber: "31882011", checkIn: "2026-10-18T14:06:00", checkOut: "2026-10-18T17:20:00" },
+    { id: "v6", period: "2026-09", unitId: "B-103", name: "Oscar Mwangi", expectedDate: "2026-09-12", expectedTime: "10:00", note: "", status: "out", phone: "+254 700 118 903", idNumber: "27661004", checkIn: "2026-09-12T10:11:00", checkOut: "2026-09-12T12:02:00" }
+  ],
+  notices: [
+    { id: "n1", at: "2026-11-12T16:40:00", audience: "tenant", unitId: "B-103", module: "Complaint Management", title: "Complaint resolved", body: "Corridor light out is Resolved. Electrician replaced the fitting and tested the circuit." },
+    { id: "n2", at: "2026-11-12T16:40:00", audience: "landlord", unitId: null, module: "Complaint Management", title: "Complaint resolved", body: "B-103 · Corridor light out is Resolved." },
+    { id: "n3", at: "2026-11-06T11:20:00", audience: "landlord", unitId: null, module: "Service Provider Management", title: "Receipt copy", body: "Receipt RCP-202611-002 for Metro Waste Co. was sent to the provider and copied to you." },
+    { id: "n4", at: "2026-11-19T09:14:00", audience: "landlord", unitId: null, module: "Visitor Management", title: "Visitor checked in", body: "Grace Wanjala checked in at B-103. Phone and ID are on the visitor log." },
+    { id: "n5", at: "2026-11-19T09:14:00", audience: "management", unitId: null, module: "Visitor Management", title: "Checked in", body: "Grace Wanjala is on site at B-103." }
+  ]
+};
+
+const ui = {
+  role: null,
+  unitId: "A-101",
+  view: "home",
+  period: CURRENT_PERIOD,
+  modal: null,
+  meterUnit: null,
+  filters: { charges: "", chargeStatus: "all", waterStatus: "all", complaints: "all", complaintUnit: "", visitors: "all", visitorUnit: "" }
+};
+
+let data = fresh();
+let lastRenderKey = "";
+
+function fresh() { return JSON.parse(JSON.stringify(SEED)); }
+function unitById(id) { return UNITS.find(u => u.id === id); }
+function payFor(id, period = periodKey()) { return data.payments.find(p => p.unitId === id && p.period === period); }
+function meterFor(id, period = periodKey()) { return data.meters.find(m => m.unitId === id && m.period === period); }
+function periodProviders() { return data.providers.filter(p => p.period === periodKey()); }
+function priorReading(unitId) {
+  const current = meterFor(unitId);
+  if (current) return current.previous;
+  const earlier = data.meters.filter(m => m.unitId === unitId && m.period < periodKey()).sort((a, b) => b.period.localeCompare(a.period))[0];
+  return earlier ? earlier.current : unitById(unitId).opening;
+}
+function occupied() { return UNITS.filter(u => u.tenant); }
+
+function load() {
+  data = fresh();
+  try {
+    const raw = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (raw && raw.version === 2) data = raw;
+  } catch (_) { /* keep seed */ }
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(UI_KEY) || "null");
+    if (saved) {
+      if (saved.role) ui.role = saved.role;
+      if (saved.unitId) ui.unitId = saved.unitId;
+      if (saved.view) ui.view = saved.view;
+      if (saved.period && PERIODS.some(item => item.key === saved.period)) ui.period = saved.period;
+      if (saved.filters) ui.filters = { ...ui.filters, ...saved.filters };
+    }
+  } catch (_) { /* ignore */ }
+  if (!unitById(ui.unitId)?.tenant) ui.unitId = "A-101";
+  ensureView();
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(data)); }
+function saveUi() {
+  const { role, unitId, view, period, filters } = ui;
+  sessionStorage.setItem(UI_KEY, JSON.stringify({ role, unitId, view, period, filters }));
+}
+function ensureView() {
+  if (!ui.role) return;
+  const allowed = NAV[ui.role].map(item => item[0]);
+  if (!allowed.includes(ui.view)) ui.view = "home";
+}
+function uid(prefix) { data.seq += 1; return prefix + "-" + data.seq; }
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+function kes(n) {
+  const rounded = Math.round(Number(n) * 100) / 100;
+  const opts = rounded % 1 ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : { maximumFractionDigits: 0 };
+  return "KES " + rounded.toLocaleString("en-US", opts);
+}
+function qty(n) {
+  if (n == null || Number.isNaN(Number(n))) return "—";
+  const rounded = Math.round(Number(n) * 10) / 10;
+  return String(rounded);
+}
+function fmtDay(value) {
+  if (!value) return "—";
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+function fmtStamp(value) {
+  if (!value) return "—";
+  return new Date(value).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+function expectedLabel(v) {
+  return fmtDay(v.expectedDate) + (v.expectedTime ? " · " + v.expectedTime : "");
+}
+function normUnit(value) { return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
+function toast(message) {
+  const el = document.getElementById("toast");
+  el.textContent = message;
+  el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove("show"), 4600);
+}
+function notify(audience, title, body, module, unitId = null) {
+  data.notices.unshift({ id: uid("n"), at: new Date().toISOString(), audience, unitId, module, title, body });
+}
+function myNotices() {
+  return data.notices.filter(n => {
+    if (ui.role === "landlord") return n.audience === "landlord";
+    if (ui.role === "management") return n.audience === "management";
+    return n.audience === "tenant" && n.unitId === ui.unitId;
+  }).slice(0, 6);
+}
+function person() {
+  if (ui.role === "landlord") return { name: "Grace Adeyemi", title: "Landlord" };
+  if (ui.role === "management") return { name: "Samuel Kariuki", title: "Management" };
+  const unit = unitById(ui.unitId);
+  return { name: unit.tenant, title: "Tenant · " + unit.id };
+}
+function pill(status) {
+  const map = {
+    draft: ["neutral", "Draft"],
+    requested: ["warn", "With finance"],
+    paid: ["good", "Paid"],
+    open: ["bad", "Open"],
+    responded: ["warn", "Responded"],
+    resolved: ["good", "Resolved"],
+    unpaid: ["bad", "Unpaid"],
+    expected: ["warn", "Expected"],
+    in: ["info", "Checked in"],
+    out: ["neutral", "Checked out"],
+    vacant: ["neutral", "Vacant"],
+    sent: ["good", "Sent"],
+    "not-sent": ["neutral", "Not sent"],
+    missing: ["warn", "Not entered"],
+    none: ["neutral", "Not billed"]
+  };
+  const [cls, label] = map[status] || ["neutral", status];
+  return `<span class="pill ${cls}">${label}</span>`;
+}
+function icon(name) {
+  const paths = {
+    home: '<path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-5v-5H10v5H5a1 1 0 0 1-1-1v-8.5Z"/>',
+    providers: '<path d="M5 7h14v11H5z"/><path d="M8 7V5h8v2M8 12h8M8 15h5"/>',
+    complaints: '<path d="M5 6h14v9H8l-3 3V6Z"/>',
+    charges: '<path d="M6 5h12v14H6z"/><path d="M9 9h6M9 12h6M9 15h3"/>',
+    water: '<path d="M12 3s6 6.2 6 10a6 6 0 0 1-12 0c0-3.8 6-10 6-10Z"/>',
+    visitors: '<path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM4 19c.4-2.4 2.2-3.5 4-3.5s3.6 1.1 4 3.5"/><path d="M16 8.5h5M16 12h5M16 15.5h3"/>',
+    finance: '<path d="M4 8h16v10H4z"/><path d="M4 12h16M8 8V6h8v2"/>'
+  };
+  return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">${paths[name] || paths.home}</svg>`;
+}
+function navIcon(id) { return icon(id === "finance" || id === "request" ? "finance" : id); }
+
+function rentStats() {
+  const rows = occupied();
+  const paid = rows.filter(u => payFor(u.id).status === "paid");
+  const collected = paid.reduce((sum, u) => sum + u.rent, 0);
+  const due = rows.reduce((sum, u) => sum + u.rent, 0);
+  return { paid: paid.length, unpaid: rows.length - paid.length, vacant: UNITS.length - rows.length, collected, due, total: rows.length };
+}
+function meterMath(prev, curr, price) {
+  const p = Number(prev), c = Number(curr), r = Number(price);
+  if ([p, c, r].some(n => Number.isNaN(n))) return null;
+  const units = Math.round((c - p) * 10) / 10;
+  return { prev: p, curr: c, price: r, units, bill: Math.round(units * r * 100) / 100 };
+}
+function waterRows() {
+  return UNITS.map(unit => {
+    const rec = meterFor(unit.id);
+    if (!rec) return { unit, rec: null, units: null, bill: null };
+    const units = Math.round((rec.current - rec.previous) * 10) / 10;
+    return { unit, rec, units, bill: Math.round(units * rec.price * 100) / 100 };
+  });
+}
+function complaintList() {
+  const rank = { open: 0, responded: 1, resolved: 2 };
+  return data.complaints.filter(c => {
+    if (c.period !== periodKey()) return false;
+    if (ui.role === "tenant" && c.unitId !== ui.unitId) return false;
+    if (ui.filters.complaints !== "all" && c.status !== ui.filters.complaints) return false;
+    const q = normUnit(ui.filters.complaintUnit);
+    if (ui.role !== "tenant" && q && !normUnit(c.unitId).includes(q)) return false;
+    return true;
+  }).sort((a, b) => rank[a.status] - rank[b.status] || b.createdAt.localeCompare(a.createdAt));
+}
+function visitorRank(v) {
+  if (v.status === "in") return 0;
+  if (v.status === "expected" && v.expectedDate === TODAY) return 1;
+  if (v.status === "expected") return 2;
+  return 3;
+}
+function visitorList() {
+  return data.visitors.filter(v => {
+    if (v.period !== periodKey()) return false;
+    if (ui.role === "tenant" && v.unitId !== ui.unitId) return false;
+    if (ui.filters.visitors === "in" && v.status !== "in") return false;
+    if (ui.filters.visitors === "expected" && v.status !== "expected") return false;
+    if (ui.filters.visitors === "out" && v.status !== "out") return false;
+    const q = normUnit(ui.filters.visitorUnit);
+    if (ui.role !== "tenant" && q && !normUnit(v.unitId).includes(q)) return false;
+    return true;
+  }).sort((a, b) => visitorRank(a) - visitorRank(b) || a.expectedDate.localeCompare(b.expectedDate));
+}
+function filteredPayments() {
+  return UNITS.map(unit => ({ unit, pay: payFor(unit.id), bill: waterBill(unit.id) })).filter(({ unit, pay, bill }) => {
+    const q = normUnit(ui.filters.charges);
+    if (q && !normUnit(unit.id).includes(q)) return false;
+    if (ui.filters.chargeStatus !== "all") {
+      if (!unit.tenant || pay.status !== ui.filters.chargeStatus) return false;
+    }
+    if (ui.filters.waterStatus === "paid" && !(unit.tenant && bill != null && pay.waterStatus === "paid")) return false;
+    if (ui.filters.waterStatus === "unpaid" && !(unit.tenant && bill != null && pay.waterStatus !== "paid")) return false;
+    return true;
+  });
+}
+function waterBill(unitId) {
+  const rec = meterFor(unitId);
+  if (!rec) return null;
+  const units = Math.round((rec.current - rec.previous) * 10) / 10;
+  return Math.round(units * rec.price * 100) / 100;
+}
+function waterState(pay, bill) {
+  if (bill == null) return "none";
+  return pay.waterStatus === "paid" ? "paid" : "unpaid";
+}
+
+function render(opts = {}) {
+  ensureView();
+  const y = window.scrollY;
+  document.getElementById("app").innerHTML = ui.role ? shell() : gate();
+  const key = (ui.role || "gate") + ":" + ui.view;
+  document.title = ui.role ? pageTitle() + " · Amani Court" : "Amani Court — Landlord System";
+  if (opts.toTop || key !== lastRenderKey) window.scrollTo(0, 0);
+  else window.scrollTo(0, y);
+  lastRenderKey = key;
+  if (opts.focus) {
+    const el = document.querySelector(opts.focus);
+    if (el) {
+      el.focus();
+      const len = el.value.length;
+      try { el.setSelectionRange(len, len); } catch (_) { /* selects */ }
+    }
+  }
+}
+function pageTitle() {
+  if (ui.view === "home") return ui.role === "landlord" ? "Super dashboard" : "Overview";
+  const item = NAV[ui.role].find(entry => entry[0] === ui.view);
+  return item ? item[1] : "Amani Court";
+}
+
+function gate() {
+  return `
+  <div class="gate">
+    <section class="gate-brand">
+      <div class="brand-lockup">${mark()} Amani Court · Landlord system</div>
+      <h1>Five modules. Three desks.</h1>
+      <p class="lede">Tenants, the landlord, and management share one building record. Each desk shows only the work and the data that role is allowed to touch. Demo day is 19 November 2026.</p>
+      <div class="module-list">
+        <ol>
+          <li><span class="idx">1</span><div><strong>Service Provider Management</strong><br>Landlord enters expenses. A monthly request goes to Finance. The receipt returns to the provider and the landlord.</div></li>
+          <li><span class="idx">2</span><div><strong>Complaint Management</strong><br>Tenants file. Management replies and resolves. The landlord can read every step.</div></li>
+          <li><span class="idx">3</span><div><strong>Service Charge Management</strong><br>Monthly rent and water-bill status, a unit-number filter, and invoices by email and WhatsApp. Earlier months stay on record.</div></li>
+          <li><span class="idx">4</span><div><strong>Water Meter Management</strong><br>Management enters readings. Units consumed and the bill are calculated.</div></li>
+          <li><span class="idx">5</span><div><strong>Visitor Management</strong><br>Tenants register a visit. Security checks the guest in and out. The landlord sees the full log.</div></li>
+        </ol>
+      </div>
+    </section>
+    <section class="gate-panel">
+      <p class="kicker">Choose a desk</p>
+      <h2>Who is signing in?</h2>
+      <article class="role-card">
+        <h2>Tenant</h2>
+        <p class="who">One unit. Own complaints, rent, water bill, and visitors.</p>
+        <label class="field"><span>Demo unit</span>
+          <select id="gate-unit">${occupied().map(u => `<option value="${u.id}" ${u.id === ui.unitId ? "selected" : ""}>${u.id} · ${esc(u.tenant)}</option>`).join("")}</select>
+        </label>
+        <ul>
+          <li>File a complaint and read the response and Resolved confirmation</li>
+          <li>See this unit’s rent status and invoice</li>
+          <li>See this unit’s water bill</li>
+          <li>Register a visitor’s name and expected date</li>
+        </ul>
+        <button type="button" class="btn primary" data-action="enter" data-role="tenant">Enter tenant desk</button>
+      </article>
+      <article class="role-card">
+        <h2>Landlord</h2>
+        <p class="who">Grace Adeyemi · super dashboard for the whole building</p>
+        <ul>
+          <li>Service provider expenses, the monthly finance request, and receipt copies</li>
+          <li>Every complaint, management response, and resolved status</li>
+          <li>Rent ledger, unit-number filter, monthly sync, and invoices</li>
+          <li>Water bills for every unit, and the full visitor log</li>
+        </ul>
+        <button type="button" class="btn ink" data-action="enter" data-role="landlord">Enter landlord desk</button>
+      </article>
+      <article class="role-card">
+        <h2>Management</h2>
+        <p class="who">Samuel Kariuki · operations, security, and finance</p>
+        <ul>
+          <li>Respond to complaints and mark them Resolved for the tenant</li>
+          <li>Confirm visitors at the gate, record phone and ID, check in and out</li>
+          <li>Enter water readings and calculate the monthly bill</li>
+          <li>Pay service-provider requests and issue receipts</li>
+        </ul>
+        <button type="button" class="btn primary" data-action="enter" data-role="management">Enter management desk</button>
+      </article>
+      <button type="button" class="linkish" data-action="reset-demo" style="color: var(--muted)">Reset demo data</button>
+    </section>
+  </div>`;
+}
+function mark() {
+  return `<svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 23V13l8-5 8 5v10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 23v-6h6v6" fill="none" stroke="currentColor" stroke-width="2"/></svg>`;
+}
+
+function shell() {
+  return `<div class="shell">${sidebar()}<div class="workspace">${topbar()}<main>${view()}</main></div></div>${modal()}`;
+}
+function sidebar() {
+  const items = NAV[ui.role].map(([id, label]) => `
+    <button type="button" class="nav ${ui.view === id ? "active" : ""}" data-action="set-view" data-view="${id}" ${ui.view === id ? 'aria-current="page"' : ""}>
+      ${navIcon(id)}<span>${label}</span>
+    </button>`).join("");
+  return `<aside>
+    <div class="side-brand">${mark()}<div><strong>Amani Court</strong><span>${periodLabel()}</span></div></div>
+    <nav>${items}</nav>
+    <div class="side-foot">
+      <button type="button" class="linkish" data-action="guide">Access guide</button>
+      <button type="button" class="linkish" data-action="reset-demo">Reset demo data</button>
+    </div>
+  </aside>`;
+}
+function topbar() {
+  const who = person();
+  const unitSwitch = ui.role === "tenant" ? `<label class="field inline"><span class="eyebrow">Unit</span><select id="unit-switch" aria-label="Demo unit">${occupied().map(u => `<option value="${u.id}" ${u.id === ui.unitId ? "selected" : ""}>${u.id} · ${esc(u.tenant)}</option>`).join("")}</select></label>` : "";
+  const periodSwitch = ui.role === "landlord" || ui.role === "management" ? `<label class="field inline"><span class="eyebrow">Period</span><select id="period-switch" aria-label="Period">${PERIODS.map(item => `<option value="${item.key}" ${item.key === periodKey() ? "selected" : ""}>${item.label}</option>`).join("")}</select></label>` : "";
+  const roles = ["tenant", "landlord", "management"].map(role => `<button type="button" data-action="switch-role" data-role="${role}" aria-pressed="${ui.role === role}">${role[0].toUpperCase() + role.slice(1)}</button>`).join("");
+  return `<header class="top">
+    <div class="top-title"><span class="eyebrow">Shared demo data</span><strong>${esc(who.name)}</strong><span class="muted">${esc(who.title)}</span></div>
+    <div class="top-actions">${periodSwitch}${unitSwitch}<div class="switch" role="group" aria-label="Switch role">${roles}</div></div>
+  </header>`;
+}
+function view() {
+  const pages = { home: home, providers: providersPage, request: requestPage, finance: financePage, complaints: complaintsPage, charges: chargesPage, water: waterPage, visitors: visitorsPage };
+  return (pages[ui.view] || home)();
+}
+function access(text) { return `<p class="access"><b>Your access.</b> ${text}</p>`; }
+function head(kicker, title, lede, actions = "") {
+  return `<div class="page-head"><div><p class="kicker">${kicker}</p><h1>${title}</h1><p class="lede">${lede}</p></div><div class="page-actions">${actions}</div></div>`;
+}
+
+function home() {
+  if (ui.role === "landlord") return landlordHome();
+  if (ui.role === "management") return managementHome();
+  return tenantHome();
+}
+
+function landlordHome() {
+  const rent = rentStats();
+  const pct = rent.due ? Math.round(rent.collected / rent.due * 100) : 0;
+  const open = data.complaints.filter(c => c.period === periodKey() && c.status !== "resolved").length;
+  const drafts = periodProviders().filter(p => p.status === "draft").length;
+  const waiting = periodProviders().filter(p => p.status === "requested").length;
+  const water = waterRows().reduce((sum, row) => sum + (row.bill || 0), 0);
+  const onSite = data.visitors.filter(v => v.period === periodKey() && v.status === "in").length;
+  const expectedToday = data.visitors.filter(v => v.period === periodKey() && v.status === "expected" && v.expectedDate === TODAY).length;
+  const chips = UNITS.map(unit => {
+    const pay = payFor(unit.id);
+    const cls = unit.tenant ? pay.status : "vacant";
+    const sub = !unit.tenant ? "Vacant" : pay.status === "paid" ? "Paid " + fmtDay(pay.paidAt.slice(0, 10)) : "Unpaid";
+    return `<button type="button" class="chip ${cls}" data-action="open-unit" data-unit="${unit.id}"><strong>${unit.id}</strong><span>${esc(unit.tenant || "No tenant")}</span><span class="muted">${sub} · ${kes(unit.rent)}</span></button>`;
+  }).join("");
+  return `
+    ${head("Landlord", "Super dashboard", "The whole building for " + periodLabel() + ". Switch the period to open an earlier month. Those records stay saved.")}
+    ${access("Every module and every unit: expenses and receipts, complaints and responses, rent, water bills, and the visitor log.")}
+    <section class="stats">
+      <button type="button" class="stat hero" data-action="set-view" data-view="charges"><span>Rent collected</span><strong class="num">${kes(rent.collected)}</strong><em>of ${kes(rent.due)} · ${rent.paid} paid · ${rent.unpaid} unpaid · ${rent.vacant} vacant</em><div class="track"><span style="width:${pct}%"></span></div></button>
+      <button type="button" class="stat" data-action="set-view" data-view="complaints"><span>Open complaints</span><strong class="num">${open}</strong><em>View responses and resolved status</em></button>
+      <button type="button" class="stat" data-action="set-view" data-view="providers"><span>Finance queue</span><strong class="num">${waiting}</strong><em>${drafts} draft expense${drafts === 1 ? "" : "s"} to send</em></button>
+      <button type="button" class="stat" data-action="set-view" data-view="visitors"><span>At the gate</span><strong class="num">${onSite}</strong><em>${expectedToday} still expected today</em></button>
+    </section>
+    <div class="page-actions" style="margin-bottom:14px">
+      <button type="button" class="btn primary" data-action="sync-charges">Run ${periodLabel()} rent cycle</button>
+      <button type="button" class="btn quiet" data-action="set-view" data-view="request">Review finance request (${drafts})</button>
+      <button type="button" class="btn quiet" data-action="set-view" data-view="water">Water billed ${kes(water)}</button>
+    </div>
+    <section class="card pad" style="margin-bottom:12px">
+      <div class="card-head"><h2>Units</h2><span class="muted">Select a unit to open its rent row</span></div>
+      <div class="chips">${chips}</div>
+    </section>
+    <section class="grid-2">
+      ${attentionBoard()}
+      ${noticeCard()}
+    </section>
+    <section class="grid-2" style="margin-top:12px">
+      ${miniComplaints()}
+      ${miniVisitors()}
+    </section>`;
+}
+function attentionBoard() {
+  const items = [];
+  occupied().forEach(unit => {
+    const pay = payFor(unit.id);
+    if (pay.status === "unpaid") items.push(`<div class="item"><div class="split-meta"><strong>${unit.id} rent unpaid</strong><button type="button" class="btn small quiet" data-action="open-unit" data-unit="${unit.id}">Open</button></div><span class="muted">${esc(unit.tenant)} · ${kes(unit.rent)}</span></div>`);
+    const bill = waterBill(unit.id);
+    if (bill != null && pay.waterStatus !== "paid") items.push(`<div class="item"><div class="split-meta"><strong>${unit.id} water unpaid</strong><button type="button" class="btn small quiet" data-action="open-unit" data-unit="${unit.id}">Open</button></div><span class="muted">${esc(unit.tenant)} · ${kes(bill)}</span></div>`);
+  });
+  data.complaints.filter(c => c.period === periodKey() && c.status === "open").forEach(c => {
+    items.push(`<div class="item"><div class="split-meta"><strong>${esc(c.subject)}</strong><button type="button" class="btn small quiet" data-action="set-view" data-view="complaints">View</button></div><span class="muted">${c.unitId} · waiting on management</span></div>`);
+  });
+  periodProviders().filter(p => p.status === "draft").forEach(p => {
+    items.push(`<div class="item"><div class="split-meta"><strong>${esc(p.provider)}</strong><button type="button" class="btn small quiet" data-action="set-view" data-view="request">Review</button></div><span class="muted">${esc(p.category)} · draft, not yet with Finance</span></div>`);
+  });
+  data.visitors.filter(v => v.period === periodKey() && v.status === "expected" && v.expectedDate === TODAY).forEach(v => {
+    items.push(`<div class="item"><strong>${esc(v.name)} expected today</strong><span class="muted">${v.unitId} · ${expectedLabel(v)}</span></div>`);
+  });
+  return `<section class="card"><div class="card-head"><h2>Needs a look</h2></div>${items.join("") || `<p class="item muted">Nothing is waiting.</p>`}</section>`;
+}
+function noticeCard() {
+  const items = myNotices().map(n => `<div class="item"><span class="kicker">${esc(n.module)}</span><strong>${esc(n.title)}</strong><span>${esc(n.body)}</span><span class="muted">${fmtStamp(n.at)}</span></div>`).join("");
+  return `<section class="card"><div class="card-head"><h2>Activity</h2></div>${items || `<p class="item muted">Actions from the other desks will land here.</p>`}</section>`;
+}
+function miniComplaints() {
+  const rows = data.complaints.filter(c => c.period === periodKey()).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 3).map(c => `
+    <div class="item"><div class="split-meta"><strong>${esc(c.subject)}</strong>${pill(c.status)}</div><span class="muted">${c.unitId} · ${esc(unitById(c.unitId).tenant)} · ${c.response ? "Response on file" : "No response yet"}</span></div>`).join("");
+  return `<section class="card"><div class="card-head"><h2>Complaints</h2><button type="button" class="btn small quiet" data-action="set-view" data-view="complaints">Open</button></div>${rows}</section>`;
+}
+function miniVisitors() {
+  const rows = data.visitors.filter(v => v.period === periodKey()).sort((a, b) => visitorRank(a) - visitorRank(b)).slice(0, 3).map(v => `
+    <div class="item"><div class="split-meta"><strong>${esc(v.name)}</strong>${pill(v.status)}</div><span class="muted">${v.unitId} · in ${fmtStamp(v.checkIn)} · out ${fmtStamp(v.checkOut)}</span></div>`).join("");
+  return `<section class="card"><div class="card-head"><h2>Visitor log</h2><button type="button" class="btn small quiet" data-action="set-view" data-view="visitors">Open</button></div>${rows}</section>`;
+}
+
+function tenantHome() {
+  const unit = unitById(ui.unitId);
+  const pay = payFor(unit.id);
+  const row = waterRows().find(item => item.unit.id === unit.id);
+  const mineComplaints = data.complaints.filter(c => c.period === periodKey() && c.unitId === unit.id);
+  const open = mineComplaints.filter(c => c.status !== "resolved").length;
+  return `
+    ${head("Tenant · " + unit.id, unit.tenant, "Your unit at Amani Court for " + periodLabel() + ".")}
+    ${access("This unit only: complaints you file, your rent invoice, your water bill, and visitors you register.")}
+    <section class="stats">
+      <article class="stat hero"><span>Monthly rent</span><strong class="num">${kes(unit.rent)}</strong><em>${pay.status === "paid" ? "Paid " + fmtStamp(pay.paidAt) : "Unpaid for " + periodLabel()}</em></article>
+      <article class="stat"><span>Complaints</span><strong class="num">${open}</strong><em>${mineComplaints.length} on your record</em></article>
+      <article class="stat"><span>Water bill</span><strong class="num">${row.bill == null ? "—" : kes(row.bill)}</strong><em>${row.bill == null ? "Not billed" : pay.waterStatus === "paid" ? "Paid" : "Unpaid"}</em></article>
+      <article class="stat"><span>Visitors</span><strong class="num">${data.visitors.filter(v => v.period === periodKey() && v.unitId === unit.id && v.status !== "out").length}</strong><em>Expected or on site</em></article>
+    </section>
+    <div class="page-actions" style="margin-bottom:14px">
+      <button type="button" class="btn primary" data-action="open-modal" data-modal="complaint">New complaint</button>
+      <button type="button" class="btn quiet" data-action="open-modal" data-modal="visitor">Register a visitor</button>
+      <button type="button" class="btn quiet" data-action="set-view" data-view="charges">Rent and invoice</button>
+    </div>
+    <section class="grid-2">${noticeCard()}${tenantSnapshot(unit, pay, row)}</section>`;
+}
+function tenantSnapshot(unit, pay, row) {
+  const invoice = pay.invoiceSentAt ? `Invoice ${pay.invoiceNo} sent ${fmtStamp(pay.invoiceSentAt)} by email and WhatsApp.` : `No ${periodLabel()} invoice sent yet.`;
+  const water = row.bill == null ? "Management has not posted this month’s reading." : `${qty(row.rec.previous)} → ${qty(row.rec.current)} · ${qty(row.units)} units × ${kes(row.rec.price)} = ${kes(row.bill)}. ${pay.waterStatus === "paid" ? "Paid " + fmtStamp(pay.waterPaidAt) : "Unpaid"}.`;
+  return `<section class="card"><div class="card-head"><h2>This month</h2></div>
+    <div class="item"><strong>Rent</strong><span>${pay.status === "paid" ? "Paid on " + fmtStamp(pay.paidAt) + " · " + esc(pay.method) : "Unpaid"}</span><span class="muted">${invoice}</span></div>
+    <div class="item"><strong>Water</strong><span>${water}</span></div>
+  </section>`;
+}
+
+function managementHome() {
+  const open = data.complaints.filter(c => c.period === periodKey() && (c.status === "open" || c.status === "responded"));
+  const expected = data.visitors.filter(v => v.period === periodKey() && v.status === "expected");
+  const onSite = data.visitors.filter(v => v.period === periodKey() && v.status === "in");
+  const missing = waterRows().filter(row => !row.rec && row.unit.tenant);
+  const queue = periodProviders().filter(p => p.status === "requested");
+  const line = (title, sub, view) => `<div class="item"><div class="split-meta"><strong>${title}</strong><button type="button" class="btn small quiet" data-action="set-view" data-view="${view}">Open</button></div><span class="muted">${sub}</span></div>`;
+  return `
+    ${head("Management", "Operations desk", "Samuel Kariuki · complaints, the gate, water readings, and the finance queue.")}
+    ${access("Respond and resolve complaints, check visitors in and out, enter water bills, and pay service-provider requests.")}
+    <section class="stats">
+      <button type="button" class="stat hero" data-action="set-view" data-view="complaints"><span>Complaints in progress</span><strong class="num">${open.length}</strong><em>Reply, then mark Resolved to notify the tenant</em></button>
+      <button type="button" class="stat" data-action="set-view" data-view="visitors"><span>Expected visitors</span><strong class="num">${expected.length}</strong><em>${onSite.length} checked in</em></button>
+      <button type="button" class="stat" data-action="set-view" data-view="water"><span>Readings to enter</span><strong class="num">${missing.length}</strong><em>Occupied units without a ${periodLabel()} bill</em></button>
+      <button type="button" class="stat" data-action="set-view" data-view="finance"><span>Finance queue</span><strong class="num">${queue.length}</strong><em>Provider requests waiting for payment</em></button>
+    </section>
+    <section class="grid-2">
+      <section class="card">
+        <div class="card-head"><h2>Queues</h2></div>
+        ${open.slice(0, 3).map(c => line(esc(c.subject), c.unitId + " · " + c.status, "complaints")).join("")}
+        ${expected.filter(v => v.expectedDate === TODAY && periodKey() === CURRENT_PERIOD).map(v => line(esc(v.name) + " at the gate", v.unitId + " · " + expectedLabel(v), "visitors")).join("")}
+        ${queue.map(p => line(esc(p.provider), kes(p.amount) + " · requested " + fmtStamp(p.requestedAt), "finance")).join("")}
+        ${missing.map(row => line("Water reading " + row.unit.id, esc(row.unit.tenant), "water")).join("")}
+      </section>
+      ${noticeCard()}
+    </section>`;
+}
+
+function providersPage() {
+  const list = periodProviders();
+  const drafts = list.filter(p => p.status === "draft");
+  const rows = list.map(p => `<tr>
+    <td>${esc(p.category)}<div class="muted">${esc(p.detail)}</div></td>
+    <td>${esc(p.provider)}<div class="muted">${esc(p.email)}</div></td>
+    <td class="num">${kes(p.amount)}</td>
+    <td>${pill(p.status)}</td>
+    <td class="actions">${p.status === "draft" ? `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="provider" data-id="${p.id}">Edit</button>` : ""}${p.receiptNo ? `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="receipt" data-id="${p.id}">${esc(p.receiptNo)}</button>` : `<span class="muted">${p.status === "requested" ? "Waiting on Finance" : ""}</span>`}</td>
+  </tr>`).join("");
+  const paid = list.filter(p => p.status === "paid").reduce((s, p) => s + p.amount, 0);
+  const requested = list.filter(p => p.status === "requested").reduce((s, p) => s + p.amount, 0);
+  return `
+    ${head("Service Provider Management", "Provider expenses", "Enter staff salaries, trash collection, wifi, and other costs for " + periodLabel() + ". Drafts stay here until you review and send them.", `<button type="button" class="btn quiet" data-action="open-modal" data-modal="provider">Add expense</button><button type="button" class="btn primary" data-action="set-view" data-view="request">Review finance request (${drafts.length})</button>`)}
+    ${access("Create and edit drafts for this period, then open the finance request page to send them. Receipts come back after Finance pays.")}
+    <section class="stats">
+      <article class="stat"><span>Draft</span><strong class="num">${kes(drafts.reduce((s, p) => s + p.amount, 0))}</strong><em>${drafts.length} not sent</em></article>
+      <article class="stat"><span>With finance</span><strong class="num">${kes(requested)}</strong><em>Waiting for payment</em></article>
+      <article class="stat"><span>Paid</span><strong class="num">${kes(paid)}</strong><em>Receipts issued</em></article>
+    </section>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Expense</th><th>Provider</th><th class="num">Amount</th><th>Status</th><th>Receipt</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+function requestPage() {
+  const drafts = periodProviders().filter(p => p.status === "draft");
+  const total = drafts.reduce((sum, item) => sum + item.amount, 0);
+  const rows = drafts.map(p => `<tr>
+    <td>${esc(p.category)}<div class="muted">${esc(p.detail)}</div></td>
+    <td>${esc(p.provider)}<div class="muted">${esc(p.email)}</div></td>
+    <td class="num">${kes(p.amount)}</td>
+    <td class="actions"><button type="button" class="btn small quiet" data-action="open-modal" data-modal="provider" data-id="${p.id}">Edit</button></td>
+  </tr>`).join("");
+  return `
+    ${head("Service Provider Management", "Finance request", "These are the " + periodLabel() + " drafts. Edit any row, then trigger the request. Finance receives only what you send.", `<button type="button" class="btn primary" data-action="trigger-providers">Trigger ${periodLabel()} request (${drafts.length})</button>`)}
+    ${access("Drafts for this period only. Earlier months keep their own drafts, requests, and receipts.")}
+    <article class="stat" style="margin-bottom:12px; max-width:320px"><span>Ready to send</span><strong class="num">${kes(total)}</strong><em>${drafts.length} draft${drafts.length === 1 ? "" : "s"}</em></article>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Expense</th><th>Provider</th><th class="num">Amount</th><th></th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="4">No drafts for ${periodLabel()}. Add an expense from Service Provider Management.</td></tr>`}</tbody>
+    </table></div>`;
+}
+function financePage() {
+  const rows = periodProviders().filter(p => p.status !== "draft").map(p => `<tr>
+    <td>${esc(p.provider)}<div class="muted">${esc(p.email)}</div></td>
+    <td>${esc(p.category)}<div class="muted">${esc(p.detail)}</div></td>
+    <td class="num">${kes(p.amount)}</td>
+    <td>${pill(p.status)}<div class="muted">${p.requestedAt ? "Requested " + fmtStamp(p.requestedAt) : ""}</div></td>
+    <td class="actions">${p.status === "requested" ? `<button type="button" class="btn small primary" data-action="open-modal" data-modal="pay" data-id="${p.id}">Record payment</button>` : `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="receipt" data-id="${p.id}">View receipt</button>`}</td>
+  </tr>`).join("");
+  return `
+    ${head("Service Provider Management", "Finance desk", "Requests the landlord triggered for " + periodLabel() + " arrive here. Record the payment and a receipt is sent to the provider, with a copy to the landlord.")}
+    ${access("Pay this period’s requested expenses and issue receipts. Drafts stay on the landlord’s finance request page. Other months remain on record.")}
+    <div class="table-wrap"><table>
+      <thead><tr><th>Provider</th><th>Expense</th><th class="num">Amount</th><th>Status</th><th></th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="5">No payment requests yet.</td></tr>`}</tbody>
+    </table></div>`;
+}
+
+function complaintsPage() {
+  const list = complaintList();
+  const filters = ui.role === "tenant" ? "" : toolbarHtml("complaints", "complaint-unit", ui.filters.complaintUnit, [["all", "All"], ["open", "Open"], ["responded", "Responded"], ["resolved", "Resolved"]]);
+  const cards = list.map(c => complaintCard(c)).join("") || `<div class="record"><p>No complaints match this view.</p></div>`;
+  const action = ui.role === "tenant" ? `<button type="button" class="btn primary" data-action="open-modal" data-modal="complaint">New complaint</button>` : "";
+  const copy = {
+    tenant: ["Your complaints", "File a complaint for this unit. Management’s reply shows here, and the status reads Resolved once it is closed.", "File and track complaints for this unit. You receive the reply and a confirmation when it is resolved."],
+    landlord: ["All complaints", "Read only for " + periodLabel() + ". Every complaint, the management response, and the resolved status. Change the period to open another month.", "View complaints, responses, and status for every unit in the selected period."],
+    management: ["Complaint queue", "Write what was done, then mark the complaint Resolved. This queue is " + periodLabel() + ". Earlier months stay on record.", "Read this period’s complaints, record the response, and resolve them."]
+  }[ui.role];
+  return `${head("Complaint Management", copy[0], copy[1], action)}${access(copy[2])}${filters}<div class="stack" id="filter-results">${cards}</div>`;
+}
+function complaintCard(c) {
+  const unit = unitById(c.unitId);
+  const response = c.response ? esc(c.response) : `<span class="muted">No response yet.</span>`;
+  let banner = "";
+  if (c.status === "resolved" && ui.role === "tenant") banner = `<div class="banner">Status: Resolved. A confirmation was sent to you on ${fmtStamp(c.resolvedAt)}.</div>`;
+  if (c.status === "resolved" && ui.role !== "tenant") banner = `<div class="banner">Resolved ${fmtStamp(c.resolvedAt)}. Confirmation sent to ${esc(unit.tenant)}.</div>`;
+  const actions = ui.role === "management" && c.status !== "resolved" ? `<div class="row-actions"><button type="button" class="btn small primary" data-action="open-modal" data-modal="response" data-id="${c.id}">${c.response ? "Update response" : "Respond"}</button></div>` : "";
+  const who = ui.role === "tenant" ? esc(c.category) : `${c.unitId} · ${esc(unit.tenant)} · ${esc(c.category)}`;
+  return `<article class="record">
+    <header><div><span class="muted">${who}</span><h2 style="font-size:26px">${esc(c.subject)}</h2></div>${pill(c.status)}</header>
+    <p>${esc(c.details)}</p>
+    <span class="muted">Filed ${fmtStamp(c.createdAt)}</span>
+    ${banner}
+    <div class="reply"><span class="kicker">Management response</span><p>${response}</p>${c.respondedAt ? `<span class="muted">${fmtStamp(c.respondedAt)}</span>` : ""}</div>
+    ${actions}
+  </article>`;
+}
+
+function chargeBody() {
+  return filteredPayments().map(({ unit, pay, bill }) => {
+    const invoice = !unit.tenant ? "—" : pay.invoiceSentAt ? pill("sent") : pill("not-sent");
+    const actions = !unit.tenant ? "" : `<button type="button" class="btn small quiet" data-action="send-invoice" data-id="${unit.id}">${pay.invoiceSentAt ? "Resend" : "Send invoice"}</button> ${pay.invoiceNo ? `<button type="button" class="btn small quiet" data-action="open-modal" data-modal="invoice" data-id="${unit.id}">View</button>` : ""}`;
+    const water = waterState(pay, bill);
+    return `<tr>
+      <td><strong>${unit.id}</strong></td>
+      <td>${esc(unit.tenant || "Vacant")}</td>
+      <td class="num">${kes(unit.rent)}</td>
+      <td>${pill(unit.tenant ? pay.status : "vacant")}<div class="muted">${pay.paidAt ? fmtStamp(pay.paidAt) : ""}</div></td>
+      <td class="num">${bill == null ? "—" : kes(bill)}</td>
+      <td>${pill(water)}${pay.waterPaidAt ? `<div class="muted">${fmtStamp(pay.waterPaidAt)}</div>` : ""}</td>
+      <td>${invoice}</td>
+      <td class="actions">${actions}</td>
+    </tr>`;
+  }).join("");
+}
+function chargesPage() {
+  if (ui.role === "tenant") return tenantCharges();
+  const body = chargeBody();
+  const synced = data.chargeSyncAt && data.chargeSyncAt[periodKey()];
+  const sync = synced ? `Last cycle ${fmtStamp(synced)}.` : `The ${periodLabel()} cycle has not been run in this session.`;
+  return `
+    ${head("Service Charge Management", "Rent and water", "Rent and water-bill payments for " + periodLabel() + ". The unit filter matches the house or unit number. Other months stay on record.", `<button type="button" class="btn primary" data-action="sync-charges">Run ${periodLabel()} cycle</button>`)}
+    ${access("See which units have paid rent, which have paid the water bill, and which are still open. Filter by unit number and by period.")}
+    <p class="muted" style="margin-bottom:10px">${sync}</p>
+    ${chargeToolbar()}
+    <p class="hint" id="filter-note" style="margin: -4px 0 10px">${chargeNote()}</p>
+    <div class="table-wrap"><table class="ledger">
+      <thead><tr><th>House / unit</th><th>Tenant</th><th class="num">Rent</th><th>Rent status</th><th class="num">Water bill</th><th>Water status</th><th>Invoice</th><th></th></tr></thead>
+      <tbody id="filter-results">${body || `<tr><td colspan="8">No units match that filter.</td></tr>`}</tbody>
+    </table></div>`;
+}
+function chargeToolbar() {
+  const rent = [["all", "All"], ["paid", "Paid"], ["unpaid", "Unpaid"]].map(([id, label]) => `<button type="button" class="${ui.filters.chargeStatus === id ? "on" : ""}" data-action="filter-status" data-kind="charges" data-status="${id}">${label}</button>`).join("");
+  const water = [["all", "All"], ["paid", "Paid"], ["unpaid", "Unpaid"]].map(([id, label]) => `<button type="button" class="${ui.filters.waterStatus === id ? "on" : ""}" data-action="filter-status" data-kind="water" data-status="${id}">${label}</button>`).join("");
+  return `<div class="toolbar"><div><div class="seg" role="group" aria-label="Rent status"><span class="seg-label">Rent</span>${rent}</div><div class="seg" role="group" aria-label="Water status" style="margin-top:6px"><span class="seg-label">Water</span>${water}</div></div><label class="field"><span>House / unit number</span><input id="charge-filter" value="${esc(ui.filters.charges)}" placeholder="e.g. A-102 or B204" autocomplete="off" spellcheck="false"></label></div>`;
+}
+function chargeNote() {
+  const rows = filteredPayments();
+  const query = ui.filters.charges.trim();
+  const parts = [];
+  if (query && !rows.length) return `No payment matches house or unit number “${esc(query)}”.`;
+  if (query) parts.push(`Matched on unit number “${esc(query)}”.`);
+  parts.push(`${rows.length} unit${rows.length === 1 ? "" : "s"} in ${periodLabel()}.`);
+  if (ui.filters.chargeStatus !== "all") parts.push(`Rent ${ui.filters.chargeStatus}.`);
+  if (ui.filters.waterStatus !== "all") parts.push(`Water ${ui.filters.waterStatus}.`);
+  return parts.join(" ");
+}
+function tenantCharges() {
+  const unit = unitById(ui.unitId);
+  const pay = payFor(unit.id);
+  return `
+    ${head("Service Charge Management", unit.id + " rent", "Your November charge, payment status, and invoice. Invoices arrive by email and WhatsApp.")}
+    ${access("This unit’s rent and invoice only.")}
+    <article class="record">
+      <header><div><span class="muted">${periodLabel()}</span><h2>${kes(unit.rent + (waterBill(unit.id) || 0))}</h2></div>${pill(pay.status)}</header>
+      <dl class="meta">
+        <div><dt>Rent</dt><dd>${kes(unit.rent)} · ${pay.status === "paid" ? "Paid" : "Unpaid"}</dd></div>
+        <div><dt>Rent paid on</dt><dd>${pay.paidAt ? fmtStamp(pay.paidAt) : "Not paid"}</dd></div>
+        <div><dt>Water bill</dt><dd>${waterBill(unit.id) == null ? "Not billed" : kes(waterBill(unit.id))}</dd></div>
+        <div><dt>Water status</dt><dd>${waterBill(unit.id) == null ? "Not billed" : pay.waterStatus === "paid" ? "Paid " + fmtStamp(pay.waterPaidAt) : "Unpaid"}</dd></div>
+        <div><dt>Invoice</dt><dd>${pay.invoiceNo ? esc(pay.invoiceNo) : "Not sent"}</dd></div>
+        <div><dt>Delivered</dt><dd>${pay.invoiceSentAt ? fmtStamp(pay.invoiceSentAt) : "—"}</dd></div>
+      </dl>
+      <div class="row-actions">
+        ${pay.invoiceNo ? `<button type="button" class="btn small primary" data-action="open-modal" data-modal="invoice" data-id="${unit.id}">View invoice</button>` : `<span class="muted">Management’s monthly cycle sends the invoice to ${esc(unit.email)} and ${esc(unit.phone)}.</span>`}
+      </div>
+    </article>`;
+}
+
+function waterPage() {
+  if (ui.role === "management") return managementWater();
+  if (ui.role === "tenant") return tenantWater();
+  const rows = waterRows();
+  const total = rows.reduce((sum, row) => sum + (row.bill || 0), 0);
+  const body = rows.map(row => waterTr(row)).join("");
+  return `
+    ${head("Water Meter Management", "Building water bills", "Management enters the readings. Units consumed are the difference, and the bill is units consumed times the unit price.")}
+    ${access("View previous reading, current reading, units consumed, unit price, and the bill for every unit.")}
+    <div class="table-wrap"><table>
+      <thead><tr><th>Unit</th><th>Tenant</th><th class="num">Previous</th><th class="num">Current</th><th class="num">Units consumed</th><th class="num">Unit price</th><th class="num">Water bill</th></tr></thead>
+      <tbody>${body}</tbody>
+      <tfoot><tr><td colspan="6">${periodLabel()} total</td><td class="num">${kes(total)}</td></tr></tfoot>
+    </table></div>`;
+}
+function waterTr(row) {
+  const rec = row.rec;
+  if (!rec) return `<tr><td><strong>${row.unit.id}</strong></td><td>${esc(row.unit.tenant || "Vacant")}</td><td class="num">${qty(priorReading(row.unit.id))}</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td>${pill("missing")}</td></tr>`;
+  return `<tr><td><strong>${row.unit.id}</strong></td><td>${esc(row.unit.tenant || "Vacant")}</td><td class="num">${qty(rec.previous)}</td><td class="num">${qty(rec.current)}</td><td class="num">${qty(row.units)}</td><td class="num">${kes(rec.price)}</td><td class="num">${kes(row.bill)}</td></tr>`;
+}
+function tenantWater() {
+  const unit = unitById(ui.unitId);
+  const row = waterRows().find(item => item.unit.id === unit.id);
+  const body = row.rec ? `
+    <dl class="meta">
+      <div><dt>Previous reading</dt><dd>${qty(row.rec.previous)}</dd></div>
+      <div><dt>Current reading</dt><dd>${qty(row.rec.current)}</dd></div>
+      <div><dt>Units consumed</dt><dd>${qty(row.units)}</dd></div>
+      <div><dt>Unit price</dt><dd>${kes(row.rec.price)}</dd></div>
+    </dl>
+    <div class="calc"><div><span class="lbl">Water bill</span><strong>${kes(row.bill)}</strong></div><div><span class="lbl">Formula</span><strong style="font-size:16px">${qty(row.units)} × ${kes(row.rec.price)}</strong></div></div>
+    <span class="muted">Posted ${fmtStamp(row.rec.at)}. ${payFor(unit.id).waterStatus === "paid" ? "Water bill paid " + fmtStamp(payFor(unit.id).waterPaidAt) + "." : "Water bill is unpaid on the service charge ledger."}</span>` : `<p>Management has not posted the ${periodLabel()} reading for ${unit.id} yet. The previous reading on file is ${qty(priorReading(unit.id))}.</p>`;
+  return `${head("Water Meter Management", unit.id + " water bill", "Previous reading, current reading, units consumed, and the bill for your unit.")}${access("Your unit’s water bill only.")}<article class="record">${body}</article>`;
+}
+function managementWater() {
+  if (!ui.meterUnit) ui.meterUnit = UNITS.find(u => !meterFor(u.id))?.id || UNITS[0].id;
+  const unit = unitById(ui.meterUnit);
+  const rec = meterFor(unit.id);
+  const previous = rec ? rec.previous : priorReading(unit.id);
+  const current = rec ? rec.current : "";
+  const price = rec ? rec.price : TARIFF;
+  const options = UNITS.map(u => `<option value="${u.id}" ${u.id === unit.id ? "selected" : ""}>${u.id} · ${esc(u.tenant || "Vacant")}</option>`).join("");
+  return `
+    ${head("Water Meter Management", "Enter readings", "Type the previous reading, the current reading, and the unit price. Units consumed and the water bill calculate from those figures.")}
+    ${access("Enter and update " + periodLabel() + " readings. Saving a bill marks the water charge unpaid on the service charge ledger until a payment is fetched.")}
+    <div class="grid-main">
+      <form id="meter-form" class="card pad form-grid" data-form="meter">
+        <h2>${periodLabel()} reading</h2>
+        <label class="field"><span>House / unit</span><select id="meter-unit" name="unitId">${options}</select></label>
+        <div class="form-row">
+          <label class="field"><span>Previous reading</span><input id="meter-prev" name="previous" type="number" min="0" step="0.1" required value="${previous}"></label>
+          <label class="field"><span>Current reading</span><input id="meter-curr" name="current" type="number" min="0" step="0.1" required value="${current}"></label>
+        </div>
+        <label class="field"><span>Unit price (KES)</span><input id="meter-price" name="price" type="number" min="0" step="1" required value="${price}"></label>
+        <div id="meter-preview">${previewHtml(previous, current, price)}</div>
+        <button type="submit" class="btn primary">Save water bill</button>
+      </form>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Unit</th><th class="num">Previous</th><th class="num">Current</th><th class="num">Units</th><th class="num">Bill</th><th></th></tr></thead>
+        <tbody>${waterRows().map(row => `<tr>
+          <td><strong>${row.unit.id}</strong><div class="muted">${esc(row.unit.tenant || "Vacant")}</div></td>
+          <td class="num">${qty(row.rec ? row.rec.previous : priorReading(row.unit.id))}</td>
+          <td class="num">${row.rec ? qty(row.rec.current) : "—"}</td>
+          <td class="num">${row.rec ? qty(row.units) : "—"}</td>
+          <td class="num">${row.rec ? kes(row.bill) : "—"}</td>
+          <td><button type="button" class="btn small quiet" data-action="edit-meter" data-id="${row.unit.id}">${row.rec ? "Edit" : "Enter"}</button></td>
+        </tr>`).join("")}</tbody>
+      </table></div>
+    </div>`;
+}
+function previewHtml(prev, curr, price) {
+  const math = meterMath(prev, curr, price);
+  const formula = `<p class="hint">Units consumed = current − previous. Water bill = units consumed × unit price.</p>`;
+  if (curr === "" || curr == null || !math) return formula;
+  if (math.units < 0 || math.price <= 0) return `<p class="hint">Current reading needs to be at least the previous reading, and the unit price needs to be above zero.</p>`;
+  return `<div class="calc"><div><span class="lbl">Units consumed</span><strong>${qty(math.units)}</strong></div><div><span class="lbl">Water bill</span><strong>${kes(math.bill)}</strong></div></div>${formula}`;
+}
+
+function visitorsPage() {
+  const list = visitorList();
+  const action = ui.role === "tenant" ? `<button type="button" class="btn primary" data-action="open-modal" data-modal="visitor">Register a visitor</button>` : "";
+  const copy = {
+    tenant: ["Your visitors", "Add the visitor’s name and when they are expected. Security receives the request for this unit.", "Register visitors for this unit and follow check-in and check-out."],
+    landlord: ["Visitor log", "The " + periodLabel() + " gate record: name, unit, expected date, phone, ID, check-in, and check-out. Other months stay saved.", "View the visitor log for the selected period, including phone, ID, and both times."],
+    management: ["Gate desk", "Confirm visitors for " + periodLabel() + ", add phone and ID, then check them in and out. Switch the period to see earlier visits.", "See this period’s visitor name, unit, and expected date. Record phone, ID, check-in, and check-out."]
+  }[ui.role];
+  const filters = ui.role === "tenant" ? "" : toolbarHtml("visitors", "visitor-unit", ui.filters.visitorUnit, [["all", "All"], ["expected", "Expected"], ["in", "On site"], ["out", "Checked out"]]);
+  const cards = list.map(v => visitorCard(v)).join("") || `<div class="record"><p>No visitors match this view.</p></div>`;
+  return `${head("Visitor Management", copy[0], copy[1], action)}${access(copy[2])}${filters}<div class="stack" id="filter-results">${cards}</div>`;
+}
+function visitorCard(v) {
+  const unit = unitById(v.unitId);
+  const phone = ui.role === "tenant" ? "" : `<div><dt>Phone</dt><dd>${esc(v.phone || "—")}</dd></div><div><dt>ID number</dt><dd>${esc(v.idNumber || "—")}</dd></div>`;
+  let actions = "";
+  if (ui.role === "management" && v.status === "expected") actions = `<div class="row-actions"><button type="button" class="btn small primary" data-action="open-modal" data-modal="checkin" data-id="${v.id}">Check in</button></div>`;
+  if (ui.role === "management" && v.status === "in") actions = `<div class="row-actions"><button type="button" class="btn small ink" data-action="check-out" data-id="${v.id}">Check out</button></div>`;
+  const today = v.expectedDate === TODAY && v.status === "expected" ? `<span class="pill warn">Today</span>` : "";
+  return `<article class="record">
+    <header><div><span class="muted">${v.unitId} · ${esc(unit.tenant || "Vacant")}</span><h2 style="font-size:26px">${esc(v.name)}</h2></div><div class="row-actions">${today}${pill(v.status)}</div></header>
+    <dl class="meta">
+      <div><dt>Expected</dt><dd>${expectedLabel(v)}</dd></div>
+      <div><dt>Check in</dt><dd>${fmtStamp(v.checkIn)}</dd></div>
+      <div><dt>Check out</dt><dd>${fmtStamp(v.checkOut)}</dd></div>
+      ${phone}
+    </dl>
+    ${v.note ? `<span class="muted">${esc(v.note)}</span>` : ""}
+    ${actions}
+  </article>`;
+}
+
+function toolbarHtml(kind, inputId, value, options) {
+  const current = kind === "charges" ? ui.filters.chargeStatus : kind === "complaints" ? ui.filters.complaints : ui.filters.visitors;
+  const segs = options.map(([id, label]) => `<button type="button" class="${current === id ? "on" : ""}" data-action="filter-status" data-kind="${kind}" data-status="${id}">${label}</button>`).join("");
+  const label = kind === "charges" ? "House / unit number" : "House / unit number";
+  return `<div class="toolbar"><div class="seg" role="group">${segs}</div><label class="field"><span>${label}</span><input id="${inputId}" value="${esc(value)}" placeholder="e.g. A-102 or B204" autocomplete="off" spellcheck="false"></label></div>`;
+}
+
+function modal() {
+  if (!ui.modal) return "";
+  const map = { provider: providerModal, receipt: receiptModal, pay: payModal, complaint: complaintModal, response: responseModal, invoice: invoiceModal, visitor: visitorModal, checkin: checkinModal };
+  const html = (map[ui.modal.type] || (() => ""))();
+  if (!html) return "";
+  return `<div class="overlay">${html}</div>`;
+}
+function modalShell(title, lede, body, wide) {
+  return `<div class="modal ${wide ? "wide" : ""}" role="dialog" aria-modal="true" aria-labelledby="modal-title"><p class="kicker">Amani Court</p><h2 id="modal-title">${title}</h2><p class="lede">${lede}</p>${body}</div>`;
+}
+function providerModal() {
+  const item = ui.modal.id ? data.providers.find(p => p.id === ui.modal.id) : null;
+  const categories = ["Staff salaries", "Trash collection", "Wifi", "Other"];
+  const options = categories.map(name => `<option ${item && item.category === name ? "selected" : ""}>${esc(name)}</option>`).join("");
+  return modalShell(item ? "Edit draft" : "Add a provider expense", item ? `This ${periodLabel(item.period)} draft can be changed until you trigger the finance request.` : `This stays a draft for ${periodLabel()} until you send it from the finance request page.`, `
+    <form class="form-grid" data-form="provider" style="margin-top:12px">
+      <input type="hidden" name="id" value="${item ? item.id : ""}">
+      <label class="field"><span>Category</span><select name="category" required>${options}</select></label>
+      <div class="form-row">
+        <label class="field"><span>Provider or staff name</span><input name="provider" required value="${item ? esc(item.provider) : ""}" placeholder="Caretaker, security firm, wifi provider"></label>
+        <label class="field"><span>Provider email</span><input name="email" type="email" required value="${item ? esc(item.email) : ""}" placeholder="accounts@provider.test"></label>
+      </div>
+      <label class="field"><span>Detail</span><input name="detail" required value="${item ? esc(item.detail) : ""}" placeholder="Caretaker, cleaners, monthly collection"></label>
+      <label class="field"><span>Amount (KES)</span><input name="amount" type="number" min="1" step="1" required value="${item ? item.amount : ""}"></label>
+      <div class="modal-actions"><button type="button" class="btn quiet" data-action="close-modal">Cancel</button><button type="submit" class="btn primary">${item ? "Save draft" : "Save expense"}</button></div>
+    </form>`);
+}
+function payModal() {
+  const item = data.providers.find(p => p.id === ui.modal.id);
+  if (!item) return "";
+  return modalShell("Record payment", `${esc(item.provider)} · ${kes(item.amount)}. The receipt goes to ${esc(item.email)} and a copy goes to Grace Adeyemi.`, `
+    <form class="form-grid" data-form="pay" style="margin-top:12px">
+      <input type="hidden" name="id" value="${item.id}">
+      <label class="field"><span>Method</span><select name="method" required><option>Bank transfer</option><option>M-Pesa</option><option>Cash</option></select></label>
+      <label class="field"><span>Payment reference</span><input name="reference" required placeholder="Transaction reference"></label>
+      <div class="modal-actions"><button type="button" class="btn quiet" data-action="close-modal">Cancel</button><button type="submit" class="btn primary">Pay and issue receipt</button></div>
+    </form>`);
+}
+function receiptModal() {
+  const item = data.providers.find(p => p.id === ui.modal.id);
+  if (!item || !item.receiptNo) return "";
+  return modalShell("Payment receipt", "Original to the service provider. Copy to the landlord.", `
+    <div class="doc">
+      <div class="doc-top"><div><span class="kicker">Receipt</span><h3>${esc(item.receiptNo)}</h3></div><strong>${kes(item.amount)}</strong></div>
+      <dl class="meta">
+        <div><dt>Paid to</dt><dd>${esc(item.provider)}</dd></div>
+        <div><dt>Email</dt><dd>${esc(item.email)}</dd></div>
+        <div><dt>Category</dt><dd>${esc(item.category)}</dd></div>
+        <div><dt>Detail</dt><dd>${esc(item.detail)}</dd></div>
+        <div><dt>Period</dt><dd>${periodLabel(item.period)}</dd></div>
+        <div><dt>Paid on</dt><dd>${fmtStamp(item.paidAt)}</dd></div>
+        <div><dt>Method</dt><dd>${esc(item.method)}</dd></div>
+        <div><dt>Reference</dt><dd>${esc(item.reference)}</dd></div>
+      </dl>
+      <p class="hint" style="margin-top:12px">Sent to ${esc(item.email)}. Copy sent to grace.adeyemi@amani.test.</p>
+    </div>
+    <div class="modal-actions"><button type="button" class="btn primary" data-action="close-modal">Close</button></div>`, true);
+}
+function complaintModal() {
+  const unit = unitById(ui.unitId);
+  return modalShell("New complaint", `Filed for ${unit.id} · ${esc(unit.tenant)}. Management and the landlord will see it.`, `
+    <form class="form-grid" data-form="complaint" style="margin-top:12px">
+      <label class="field"><span>Category</span><select name="category"><option>Plumbing</option><option>Electrical</option><option>Maintenance</option><option>Security</option><option>Noise</option><option>Cleaning</option><option>Other</option></select></label>
+      <label class="field"><span>Subject</span><input name="subject" required maxlength="80" placeholder="Short summary"></label>
+      <label class="field"><span>Details</span><textarea name="details" required placeholder="What happened, and where in the unit?"></textarea></label>
+      <div class="modal-actions"><button type="button" class="btn quiet" data-action="close-modal">Cancel</button><button type="submit" class="btn primary">Submit complaint</button></div>
+    </form>`);
+}
+function responseModal() {
+  const item = data.complaints.find(c => c.id === ui.modal.id);
+  if (!item) return "";
+  const unit = unitById(item.unitId);
+  return modalShell("Response", `${item.unitId} · ${esc(item.subject)}. Resolving sends a confirmation to ${esc(unit.tenant)}.`, `
+    <p style="margin-top:10px">${esc(item.details)}</p>
+    <form class="form-grid" data-form="response" style="margin-top:12px">
+      <input type="hidden" name="id" value="${item.id}">
+      <label class="field"><span>Response details</span><textarea name="response" required placeholder="What was done, and by whom?">${esc(item.response)}</textarea></label>
+      <div class="modal-actions">
+        <button type="button" class="btn quiet" data-action="close-modal">Cancel</button>
+        <button type="submit" class="btn quiet" name="intent" value="save">Save response</button>
+        <button type="submit" class="btn primary" name="intent" value="resolve">Resolve and notify tenant</button>
+      </div>
+    </form>`);
+}
+function invoiceModal() {
+  const unit = unitById(ui.modal.id);
+  const pay = unit && payFor(unit.id);
+  if (!unit || !pay?.invoiceNo) return "";
+  const bill = waterBill(unit.id);
+  const total = unit.rent + (bill || 0);
+  return modalShell("Service charge invoice", "Rent and water, delivered by email and WhatsApp.", `
+    <div class="doc">
+      <div class="doc-top"><div><span class="kicker">Invoice</span><h3>${esc(pay.invoiceNo)}</h3></div><strong>${kes(total)}</strong></div>
+      <dl class="meta">
+        <div><dt>Unit</dt><dd>${unit.id}</dd></div>
+        <div><dt>Tenant</dt><dd>${esc(unit.tenant)}</dd></div>
+        <div><dt>Period</dt><dd>${periodLabel(pay.period)}</dd></div>
+        <div><dt>Rent</dt><dd>${kes(unit.rent)} · ${pay.status === "paid" ? "Paid" : "Unpaid"}</dd></div>
+        <div><dt>Water bill</dt><dd>${bill == null ? "Not billed" : kes(bill) + " · " + (pay.waterStatus === "paid" ? "Paid" : "Unpaid")}</dd></div>
+        <div><dt>Rent paid on</dt><dd>${pay.paidAt ? fmtStamp(pay.paidAt) : "—"}</dd></div>
+        <div><dt>Water paid on</dt><dd>${pay.waterPaidAt ? fmtStamp(pay.waterPaidAt) : "—"}</dd></div>
+        <div><dt>Email</dt><dd>${esc(unit.email)}</dd></div>
+        <div><dt>WhatsApp</dt><dd>${esc(unit.phone)}</dd></div>
+        <div><dt>Sent</dt><dd>${fmtStamp(pay.invoiceSentAt)}</dd></div>
+      </dl>
+    </div>
+    <div class="modal-actions"><button type="button" class="btn primary" data-action="close-modal">Close</button></div>`, true);
+}
+function visitorModal() {
+  const unit = unitById(ui.unitId);
+  return modalShell("Register a visitor", `Security will see the name, unit ${unit.id}, and the expected date.`, `
+    <form class="form-grid" data-form="visitor" style="margin-top:12px">
+      <label class="field"><span>Visitor name</span><input name="name" required placeholder="Full name"></label>
+      <div class="form-row">
+        <label class="field"><span>Expected date</span><input name="expectedDate" type="date" required value="${TODAY}"></label>
+        <label class="field"><span>Expected time</span><input name="expectedTime" type="time"></label>
+      </div>
+      <label class="field"><span>Note</span><input name="note" placeholder="Optional, for example family or contractor"></label>
+      <div class="modal-actions"><button type="button" class="btn quiet" data-action="close-modal">Cancel</button><button type="submit" class="btn primary">Send to security</button></div>
+    </form>`);
+}
+function checkinModal() {
+  const item = data.visitors.find(v => v.id === ui.modal.id);
+  if (!item) return "";
+  return modalShell("Check in visitor", `${esc(item.name)} · unit ${item.unitId} · expected ${expectedLabel(item)}. Record the phone and ID at the gate.`, `
+    <form class="form-grid" data-form="checkin" style="margin-top:12px">
+      <input type="hidden" name="id" value="${item.id}">
+      <label class="field"><span>Phone number</span><input name="phone" required placeholder="+254 7…"></label>
+      <label class="field"><span>ID number</span><input name="idNumber" required placeholder="National ID or passport"></label>
+      <div class="modal-actions"><button type="button" class="btn quiet" data-action="close-modal">Cancel</button><button type="submit" class="btn primary">Confirm check in</button></div>
+    </form>`);
+}
+
+function closeModal() { ui.modal = null; render(); }
+function go(view) { ui.view = view; ui.modal = null; saveUi(); render({ toTop: true }); }
+
+function saveProvider(fd) {
+  const amount = Number(fd.get("amount"));
+  if (!fd.get("provider").trim() || !(amount > 0)) return toast("Enter the provider and an amount above zero.");
+  const fields = { category: fd.get("category"), provider: fd.get("provider").trim(), email: fd.get("email").trim(), detail: fd.get("detail").trim(), amount };
+  const existing = data.providers.find(p => p.id === fd.get("id"));
+  if (existing) {
+    if (existing.status !== "draft") return toast("Only a draft request can be edited.");
+    Object.assign(existing, fields);
+    save(); closeModal();
+    toast("Draft updated.");
+    return;
+  }
+  data.providers.unshift({
+    id: uid("p"), period: periodKey(), ...fields, status: "draft", requestedAt: null, paidAt: null, method: null, reference: null, receiptNo: null
+  });
+  save(); closeModal();
+  toast(`Draft saved for ${periodLabel()}. Review it on the finance request page.`);
+}
+function triggerProviders() {
+  const drafts = periodProviders().filter(p => p.status === "draft");
+  if (!drafts.length) return toast(`No drafts for ${periodLabel()}. Add an expense first.`);
+  const now = new Date().toISOString();
+  drafts.forEach(p => { p.status = "requested"; p.requestedAt = now; });
+  notify("management", "Payment request", `${drafts.length} ${periodLabel()} expense${drafts.length === 1 ? "" : "s"} sent from the landlord.`, "Service Provider Management");
+  notify("landlord", "Request sent", `${drafts.length} ${periodLabel()} expense${drafts.length === 1 ? "" : "s"} sent to Finance.`, "Service Provider Management");
+  save(); render();
+  toast(`${periodLabel()} request sent to Finance · ${drafts.length} expense${drafts.length === 1 ? "" : "s"}.`);
+}
+function payProvider(fd) {
+  const item = data.providers.find(p => p.id === fd.get("id"));
+  if (!item || item.status !== "requested") return toast("That request is no longer waiting for payment.");
+  data.counters.receipt += 1;
+  item.status = "paid";
+  item.paidAt = new Date().toISOString();
+  item.method = fd.get("method");
+  item.reference = fd.get("reference").trim();
+  item.receiptNo = "RCP-" + periodCode(item.period) + "-" + String(data.counters.receipt).padStart(3, "0");
+  notify("landlord", "Receipt copy", `${item.receiptNo} for ${item.provider} was sent to ${item.email} and copied to you.`, "Service Provider Management");
+  save(); closeModal();
+  toast(`${item.receiptNo} issued. Sent to ${item.provider} and copied to the landlord.`);
+}
+function saveComplaint(fd) {
+  const subject = fd.get("subject").trim();
+  const details = fd.get("details").trim();
+  if (!subject || !details) return toast("Add a subject and the complaint details.");
+  const unit = unitById(ui.unitId);
+  data.complaints.unshift({
+    id: uid("c"), period: periodKey(), unitId: unit.id, category: fd.get("category"), subject, details,
+    createdAt: new Date().toISOString(), status: "open", response: "", respondedAt: null, resolvedAt: null
+  });
+  notify("management", "New complaint", `${unit.id} · ${subject}`, "Complaint Management");
+  notify("landlord", "New complaint", `${unit.id} · ${unit.tenant} · ${subject}`, "Complaint Management");
+  save(); closeModal();
+  toast("Complaint sent. Management and the landlord can see it.");
+}
+function saveResponse(fd, intent) {
+  const item = data.complaints.find(c => c.id === fd.get("id"));
+  const text = fd.get("response").trim();
+  if (!item || !text) return toast("Write the response details first.");
+  const unit = unitById(item.unitId);
+  item.response = text;
+  item.respondedAt = new Date().toISOString();
+  if (intent === "resolve") {
+    item.status = "resolved";
+    item.resolvedAt = item.respondedAt;
+    notify("tenant", "Complaint resolved", `${item.subject} is Resolved. ${text}`, "Complaint Management", item.unitId);
+    notify("landlord", "Complaint resolved", `${item.unitId} · ${item.subject} is Resolved.`, "Complaint Management");
+    save(); closeModal();
+    toast(`Marked Resolved. Confirmation sent to ${unit.tenant} (${item.unitId}).`);
+    return;
+  }
+  item.status = "responded";
+  notify("tenant", "Management replied", `${item.subject}: ${text}`, "Complaint Management", item.unitId);
+  notify("landlord", "Response posted", `${item.unitId} · ${item.subject} is Responded.`, "Complaint Management");
+  save(); closeModal();
+  toast("Response saved. Status is Responded. Resolve it when the work is finished.");
+}
+function syncCharges() {
+  const applied = [];
+  const waterApplied = [];
+  data.pendingPayments = data.pendingPayments.filter(entry => {
+    if (entry.period !== periodKey()) return true;
+    const pay = payFor(entry.unitId);
+    if (!pay || pay.status === "paid") return false;
+    pay.status = "paid";
+    pay.paidAt = entry.paidAt;
+    pay.method = entry.method;
+    pay.reference = entry.reference;
+    applied.push(entry.unitId);
+    return false;
+  });
+  data.pendingWater = (data.pendingWater || []).filter(entry => {
+    if (entry.period !== periodKey()) return true;
+    const pay = payFor(entry.unitId);
+    const bill = waterBill(entry.unitId);
+    if (!pay || bill == null || pay.waterStatus === "paid") return false;
+    pay.waterStatus = "paid";
+    pay.waterPaidAt = entry.paidAt;
+    pay.waterMethod = entry.method;
+    waterApplied.push(entry.unitId);
+    return false;
+  });
+  const sent = [];
+  occupied().forEach(unit => {
+    const pay = payFor(unit.id);
+    if (!pay || pay.invoiceSentAt) return;
+    pay.invoiceNo = "INV-" + unit.id.replace("-", "") + "-" + periodCode();
+    pay.invoiceSentAt = new Date().toISOString();
+    sent.push(unit.id);
+    const bill = waterBill(unit.id);
+    notify("tenant", "Invoice sent", `${pay.invoiceNo} for rent ${kes(unit.rent)}${bill == null ? "" : " and water " + kes(bill)} was sent by email and WhatsApp.`, "Service Charge Management", unit.id);
+  });
+  if (!data.chargeSyncAt || typeof data.chargeSyncAt !== "object") data.chargeSyncAt = {};
+  data.chargeSyncAt[periodKey()] = new Date().toISOString();
+  const summary = `Synced ${periodLabel()}` + (applied.length ? `. New rent payment: ${applied.join(", ")}` : ". No new rent payments") + (waterApplied.length ? `. Water paid: ${waterApplied.join(", ")}` : "") + (sent.length ? `. Invoices sent to ${sent.join(", ")}.` : ". Invoices were already sent.");
+  notify("landlord", periodLabel() + " service charge cycle", summary, "Service Charge Management");
+  save(); render();
+  toast(summary + " Delivery is email and WhatsApp.");
+}
+function sendInvoice(unitId) {
+  const unit = unitById(unitId);
+  const pay = payFor(unitId);
+  if (!unit?.tenant || !pay) return toast("That unit has no tenant to invoice.");
+  const freshInvoice = !pay.invoiceNo;
+  pay.invoiceNo = pay.invoiceNo || ("INV-" + unit.id.replace("-", "") + "-" + periodCode());
+  pay.invoiceSentAt = new Date().toISOString();
+  const bill = waterBill(unit.id);
+  notify("tenant", freshInvoice ? "Invoice sent" : "Invoice resent", `${pay.invoiceNo} for rent ${kes(unit.rent)}${bill == null ? "" : " and water " + kes(bill)} was sent by email and WhatsApp.`, "Service Charge Management", unit.id);
+  save(); render();
+  toast(`${pay.invoiceNo} sent to ${unit.tenant} by email (${unit.email}) and WhatsApp (${unit.phone}).`);
+}
+function saveMeter(fd) {
+  const unit = unitById(fd.get("unitId"));
+  const math = meterMath(fd.get("previous"), fd.get("current"), fd.get("price"));
+  if (!unit || !math || math.units < 0 || math.price <= 0) return toast("Check the readings. Current needs to be at least previous, and the unit price needs to be above zero.");
+  let rec = meterFor(unit.id);
+  const verb = rec ? "updated" : "saved";
+  if (!rec) {
+    rec = { id: uid("m"), unitId: unit.id, period: periodKey() };
+    data.meters.push(rec);
+  }
+  rec.previous = math.prev;
+  rec.current = math.curr;
+  rec.price = math.price;
+  rec.at = new Date().toISOString();
+  const pay = payFor(unit.id);
+  if (pay && pay.waterStatus !== "paid") pay.waterStatus = "unpaid";
+  const body = `${unit.id}: previous ${qty(math.prev)}, current ${qty(math.curr)}, ${qty(math.units)} units × ${kes(math.price)} = ${kes(math.bill)}.`;
+  notify("landlord", "Water bill " + verb, body + " Water status on the service charge ledger is " + (pay && pay.waterStatus === "paid" ? "Paid." : "Unpaid."), "Water Meter Management");
+  if (unit.tenant) notify("tenant", "Water bill posted", `${periodLabel()} bill is ${kes(math.bill)} for ${qty(math.units)} units.`, "Water Meter Management", unit.id);
+  ui.meterUnit = unit.id;
+  save(); render();
+  toast(`Reading ${verb}. ${qty(math.units)} units × ${kes(math.price)} = ${kes(math.bill)}.`);
+}
+function saveVisitor(fd) {
+  const name = fd.get("name").trim();
+  const expectedDate = fd.get("expectedDate");
+  if (!name || !expectedDate) return toast("Enter the visitor name and the expected date.");
+  const unit = unitById(ui.unitId);
+  data.visitors.unshift({
+    id: uid("v"), period: periodKey(), unitId: unit.id, name, expectedDate, expectedTime: fd.get("expectedTime") || "", note: fd.get("note").trim(),
+    status: "expected", phone: "", idNumber: "", checkIn: null, checkOut: null
+  });
+  notify("management", "Visitor expected", `${name} → ${unit.id} on ${fmtDay(expectedDate)}.`, "Visitor Management");
+  notify("landlord", "Visitor registered", `${name} → ${unit.id} on ${fmtDay(expectedDate)}. Waiting for the gate.`, "Visitor Management");
+  save(); closeModal();
+  toast(`Sent to security: ${name}, unit ${unit.id}, ${fmtDay(expectedDate)}.`);
+}
+function checkIn(fd) {
+  const item = data.visitors.find(v => v.id === fd.get("id"));
+  const phone = fd.get("phone").trim();
+  const idNumber = fd.get("idNumber").trim();
+  if (!item) return;
+  if (phone.length < 6 || idNumber.length < 4) return toast("Enter the phone number and ID number from the visitor at the gate.");
+  item.phone = phone;
+  item.idNumber = idNumber;
+  item.checkIn = new Date().toISOString();
+  item.status = "in";
+  const unit = unitById(item.unitId);
+  notify("landlord", "Visitor checked in", `${item.name} checked in at ${item.unitId}. Phone ${phone}, ID ${idNumber}.`, "Visitor Management");
+  notify("tenant", "Visitor checked in", `${item.name} checked in at ${fmtStamp(item.checkIn)}.`, "Visitor Management", item.unitId);
+  notify("management", "Checked in", `${item.name} is on site at ${item.unitId}.`, "Visitor Management");
+  save(); closeModal();
+  toast(`${item.name} checked in at ${fmtStamp(item.checkIn)}. ${unit.id} log updated for the landlord.`);
+}
+function checkOut(id) {
+  const item = data.visitors.find(v => v.id === id);
+  if (!item || item.status !== "in") return toast("That visitor is not checked in.");
+  item.checkOut = new Date().toISOString();
+  item.status = "out";
+  notify("landlord", "Visitor checked out", `${item.name} left ${item.unitId} at ${fmtStamp(item.checkOut)}.`, "Visitor Management");
+  notify("tenant", "Visitor checked out", `${item.name} checked out at ${fmtStamp(item.checkOut)}.`, "Visitor Management", item.unitId);
+  save(); render();
+  toast(`${item.name} checked out at ${fmtStamp(item.checkOut)}. Times are on the landlord dashboard.`);
+}
+
+function onClick(event) {
+  if (event.target.classList?.contains("overlay")) { closeModal(); return; }
+  const btn = event.target.closest("[data-action]");
+  if (!btn) return;
+  const action = btn.dataset.action;
+  if (action === "enter") {
+    ui.role = btn.dataset.role;
+    if (ui.role === "tenant") ui.unitId = document.getElementById("gate-unit").value;
+    ui.view = "home";
+    ui.modal = null;
+    saveUi();
+    render({ toTop: true });
+    return;
+  }
+  if (action === "switch-role") {
+    ui.role = btn.dataset.role;
+    ui.modal = null;
+    ensureView();
+    saveUi();
+    render({ toTop: true });
+    return;
+  }
+  if (action === "guide") { ui.role = null; ui.modal = null; saveUi(); render({ toTop: true }); return; }
+  if (action === "set-view") { go(btn.dataset.view); return; }
+  if (action === "open-unit") {
+    ui.filters.charges = btn.dataset.unit;
+    ui.filters.chargeStatus = "all";
+    ui.filters.waterStatus = "all";
+    go("charges");
+    return;
+  }
+  if (action === "open-modal") { ui.modal = { type: btn.dataset.modal, id: btn.dataset.id || null }; render(); return; }
+  if (action === "close-modal") { closeModal(); return; }
+  if (action === "trigger-providers") { triggerProviders(); return; }
+  if (action === "sync-charges") { syncCharges(); return; }
+  if (action === "send-invoice") { sendInvoice(btn.dataset.id); return; }
+  if (action === "check-out") { checkOut(btn.dataset.id); return; }
+  if (action === "edit-meter") { ui.meterUnit = btn.dataset.id; render({ focus: "#meter-curr" }); return; }
+  if (action === "filter-status") {
+    const status = btn.dataset.status;
+    if (btn.dataset.kind === "charges") ui.filters.chargeStatus = status;
+    if (btn.dataset.kind === "water") ui.filters.waterStatus = status;
+    if (btn.dataset.kind === "complaints") ui.filters.complaints = status;
+    if (btn.dataset.kind === "visitors") ui.filters.visitors = status;
+    saveUi();
+    render();
+    return;
+  }
+  if (action === "reset-demo") {
+    if (!confirm("Restore the original demo data?")) return;
+    data = fresh();
+    save();
+    ui.modal = null;
+    ui.meterUnit = null;
+    toast("Demo data restored.");
+    render();
+  }
+}
+function onSubmit(event) {
+  const form = event.target;
+  if (!(form instanceof HTMLFormElement)) return;
+  event.preventDefault();
+  const fd = new FormData(form);
+  const kind = form.dataset.form;
+  if (kind === "provider") saveProvider(fd);
+  if (kind === "pay") payProvider(fd);
+  if (kind === "complaint") saveComplaint(fd);
+  if (kind === "response") saveResponse(fd, event.submitter?.value || "save");
+  if (kind === "meter") saveMeter(fd);
+  if (kind === "visitor") saveVisitor(fd);
+  if (kind === "checkin") checkIn(fd);
+}
+function onChange(event) {
+  if (event.target.id === "unit-switch") {
+    ui.unitId = event.target.value;
+    ui.modal = null;
+    saveUi();
+    render();
+  }
+  if (event.target.id === "meter-unit") {
+    ui.meterUnit = event.target.value;
+    render({ focus: "#meter-unit" });
+  }
+  if (event.target.id === "period-switch") {
+    ui.period = event.target.value;
+    ui.meterUnit = null;
+    ui.modal = null;
+    saveUi();
+    render();
+  }
+}
+function onInput(event) {
+  const map = { "charge-filter": "charges", "complaint-unit": "complaintUnit", "visitor-unit": "visitorUnit" };
+  if (map[event.target.id]) {
+    ui.filters[map[event.target.id]] = event.target.value;
+    saveUi();
+    const results = document.getElementById("filter-results");
+    if (results && ui.view === "charges") {
+      const note = document.getElementById("filter-note");
+      if (note) note.innerHTML = chargeNote();
+      results.innerHTML = chargeBody() || `<tr><td colspan="8">No units match that filter.</td></tr>`;
+      return;
+    }
+    if (results && (ui.view === "complaints" || ui.view === "visitors")) {
+      const list = ui.view === "complaints" ? complaintList() : visitorList();
+      const empty = ui.view === "complaints" ? "No complaints match this view." : "No visitors match this view.";
+      const cards = list.map(item => ui.view === "complaints" ? complaintCard(item) : visitorCard(item)).join("");
+      results.innerHTML = cards || `<div class="record"><p>${empty}</p></div>`;
+      return;
+    }
+    return;
+  }
+  if (event.target.closest("#meter-form")) {
+    const box = document.getElementById("meter-preview");
+    if (!box) return;
+    box.innerHTML = previewHtml(
+      document.getElementById("meter-prev").value,
+      document.getElementById("meter-curr").value,
+      document.getElementById("meter-price").value
+    );
+  }
+}
+
+document.body.addEventListener("click", onClick);
+document.body.addEventListener("submit", onSubmit);
+document.body.addEventListener("change", onChange);
+document.body.addEventListener("input", onInput);
+document.addEventListener("keydown", event => { if (event.key === "Escape" && ui.modal) closeModal(); });
+load();
+render();
+</script>
+</body>
+</html>
